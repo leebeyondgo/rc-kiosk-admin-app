@@ -10,7 +10,6 @@ import {
   Menu,
   ChevronDown
 } from "lucide-react";
-import ProductSelector from "./ProductSelector";
 import AdminRecords from "./AdminRecords";
 import AdminItems from "./AdminItems";
 import AdminLogin from "./AdminLogin";
