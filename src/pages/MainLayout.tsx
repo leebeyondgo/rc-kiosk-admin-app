@@ -11,7 +11,6 @@ import {
   Boxes
 } from "lucide-react";
 import AdminRecords from "./AdminRecords";
-import AdminItems from "../modals/AdminItems";
 import AdminLogin from "./AdminLogin";
 import BulkItemManager from "./BulkItemManager";
 import KioskLinks from "./KioskLinks";
@@ -63,8 +62,6 @@ export default function MainLayout() {
         return <KioskLinks />;
       case "records":
         return <AdminRecords />;
-      case "items":
-        return <AdminItems />;
       case "bulkItems":
         return <BulkItemManager />;
       case "login":
