@@ -24,7 +24,7 @@ export default function MainLayout() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<
-    "selector" | "records" | "items" | "bulkItems" | "login"
+    "selector" | "records" | "bulkItems" | "login"
   >(() => localStorage.getItem("activeTab") as any || "selector");
 
   useEffect(() => {
@@ -45,8 +45,6 @@ export default function MainLayout() {
     switch (activeTab) {
       case "records":
         return "선택 기록";
-      case "items":
-        return "상품 관리";
       case "bulkItems":
         return "기념품 일괄 관리";
       case "login":
@@ -134,14 +132,6 @@ export default function MainLayout() {
                 >
                   <ClipboardList className="mr-2 h-4 w-4" />
                   선택 기록
-                </Button>
-                <Button
-                  variant={activeTab === "items" ? "default" : "outline"}
-                  className="w-full justify-start"
-                  onClick={() => setActiveTab("items")}
-                >
-                  <PackageOpen className="mr-2 h-4 w-4" />
-                  상품 관리
                 </Button>
                 <Button
                   variant={activeTab === "bulkItems" ? "default" : "outline"}
