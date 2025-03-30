@@ -14,6 +14,7 @@ import AdminRecords from "./AdminRecords";
 import AdminItems from "./AdminItems";
 import AdminLogin from "./AdminLogin";
 import BulkItemManager from "./BulkItemManager";
+import KioskLinks from "./KioskLinks";
 import { createClient } from "@supabase/supabase-js";
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from "@/lib/supabaseConfig";
 
@@ -58,6 +59,8 @@ export default function MainLayout() {
 
   const renderContent = () => {
     switch (activeTab) {
+      case "selector":
+        return <KioskLinks />;
       case "records":
         return <AdminRecords />;
       case "items":
