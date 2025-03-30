@@ -5,12 +5,30 @@ import { Button } from "@/components/ui/button";
 import Modal from "@/components/ui/Modal";
 import AdminItems from "@/modals/AdminItems";
 import GlobalItemManager from "@/pages/GlobalItemManager";
+import GiftPdfGeneratorModal from "@/modals/GiftPdfGeneratorModal";
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 interface Location {
   id: string;
   name: string;
+}
+
+interface LocationGiftItem {
+  id: string;
+  location_id: string;
+  gift_item_id: string;
+  sort_order: number;
+  allow_multiple: boolean;
+  visible: boolean;
+  category: "A" | "B";
+}
+
+interface GiftItem {
+  id: string;
+  name: string;
+  image_url?: string;
+  description?: string;
 }
 
 type Tab = "location" | "global";
@@ -21,35 +39,20 @@ export default function BulkItemManager() {
   const [showModal, setShowModal] = useState(false);
   const [activeTab, setActiveTab] = useState<Tab>("location");
 
-  // 동기화 관련 상태
+  // 동기화 상태
   const [syncMode, setSyncMode] = useState(false);
   const [syncSourceId, setSyncSourceId] = useState<string>("");
   const [syncTargetIds, setSyncTargetIds] = useState<string[]>([]);
 
-  // 기념품 목록을 location_id 기준으로 저장
-  const [locationItemMap, setLocationItemMap] = useState<Record<string, string[]>>({});
+  // PDF 모달 상태
+  const [pdfModalOpen, setPdfModalOpen] = useState(false);
+  const [pdfLocation, setPdfLocation] = useState<Location | null>(null);
+  const [pdfItems, setPdfItems] = useState<{ a: GiftItem[]; b: GiftItem[] }>({ a: [], b: [] });
 
   useEffect(() => {
     const fetchData = async () => {
-      const { data: locs } = await supabase.from("donation_locations").select("*");
-      const { data: items } = await supabase
-        .from("location_gift_items")
-        .select("location_id, gift_items(name)")
-        .order("sort_order");
-
-      if (locs) setLocations(locs);
-
-      // 기념품 이름들을 location_id 기준으로 묶기
-      const grouped: Record<string, string[]> = {};
-      if (items) {
-        for (const item of items) {
-          const locId = item.location_id;
-          const name = (item as any).gift_items?.name;
-          if (!name) continue;
-          grouped[locId] = grouped[locId] ? [...grouped[locId], name] : [name];
-        }
-      }
-      setLocationItemMap(grouped);
+      const { data } = await supabase.from("donation_locations").select("*");
+      if (data) setLocations(data);
     };
     fetchData();
   }, []);
@@ -89,10 +92,35 @@ export default function BulkItemManager() {
     setSyncTargetIds([]);
   };
 
+  const handlePdfClick = async (loc: Location) => {
+    const { data: locItems } = await supabase
+      .from("location_gift_items")
+      .select("*")
+      .eq("location_id", loc.id);
+
+    const { data: giftItems } = await supabase.from("gift_items").select("*");
+
+    if (!locItems || !giftItems) return;
+
+    const aItems = locItems
+      .filter((i) => i.category === "A")
+      .map((li) => giftItems.find((g) => g.id === li.gift_item_id))
+      .filter(Boolean) as GiftItem[];
+
+    const bItems = locItems
+      .filter((i) => i.category === "B")
+      .map((li) => giftItems.find((g) => g.id === li.gift_item_id))
+      .filter(Boolean) as GiftItem[];
+
+    setPdfItems({ a: aItems, b: bItems });
+    setPdfLocation(loc);
+    setPdfModalOpen(true);
+  };
+
   return (
     <div className="max-w-6xl mx-auto p-4">
+      <h2 className="text-xl font-bold mb-4">기념품 관리</h2>
 
-      {/* 탭 버튼 */}
       <div className="flex border-b mb-4 space-x-2">
         <Button
           variant={activeTab === "location" ? "default" : "ghost"}
@@ -108,7 +136,6 @@ export default function BulkItemManager() {
         </Button>
       </div>
 
-      {/* 탭 내용 */}
       {activeTab === "location" && (
         <>
           <div className="flex justify-between items-center mb-4">
@@ -165,12 +192,8 @@ export default function BulkItemManager() {
               {locations.map((loc) => (
                 <div key={loc.id} className="border rounded p-4 shadow flex flex-col gap-2">
                   <h4 className="font-semibold text-lg">{loc.name}</h4>
-                  <div className="text-sm text-gray-500">
-                    {(locationItemMap[loc.id]?.slice(0, 3) || []).join(", ")}
-                    {locationItemMap[loc.id]?.length > 3 &&
-                      ` 외 ${locationItemMap[loc.id].length - 3}개`}
-                  </div>
                   <Button onClick={() => handleLocationClick(loc)}>관리</Button>
+                  <Button variant="outline" onClick={() => handlePdfClick(loc)}>📄 안내문 생성</Button>
                 </div>
               ))}
             </div>
@@ -183,6 +206,15 @@ export default function BulkItemManager() {
               </h3>
               <AdminItems locationId={selectedLocation.id} />
             </Modal>
+          )}
+
+          {pdfModalOpen && pdfLocation && (
+            <GiftPdfGeneratorModal
+              locationName={pdfLocation.name}
+              aItems={pdfItems.a}
+              bItems={pdfItems.b}
+              onClose={() => setPdfModalOpen(false)}
+            />
           )}
         </>
       )}

@@ -151,7 +151,7 @@ export default function AdminRecords() {
                   setEndDate(today);
                 }}
               />
-              오늘늘
+              오늘
             </label>
             <label className="flex items-center gap-1">
               <input
