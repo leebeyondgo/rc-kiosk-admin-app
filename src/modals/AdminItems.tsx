@@ -108,28 +108,31 @@ export default function AdminItems({ locationId }: Props) {
     }
   };
 
-  const moveItem = async (category: "A" | "B", index: number, direction: "up" | "down") => {
+  const moveItem = async (
+    category: "A" | "B",
+    index: number,
+    direction: "up" | "down"
+  ) => {
     const categoryItems = locationItems
       .filter((item) => item.category === category)
       .sort((a, b) => a.sort_order - b.sort_order);
 
     const targetIndex = direction === "up" ? index - 1 : index + 1;
-
     if (targetIndex < 0 || targetIndex >= categoryItems.length) return;
 
     const updated = [...categoryItems];
-    const temp = updated[index].sort_order;
-    updated[index].sort_order = updated[targetIndex].sort_order;
-    updated[targetIndex].sort_order = temp;
+    const current = updated[index];
+    const target = updated[targetIndex];
 
-    await Promise.all(
-      updated.slice(index, targetIndex + 1).map((item) =>
-        supabase
-          .from("location_gift_items")
-          .update({ sort_order: item.sort_order })
-          .eq("id", item.id)
-      )
-    );
+    // swap sort_order
+    const temp = current.sort_order;
+    current.sort_order = target.sort_order;
+    target.sort_order = temp;
+
+    await Promise.all([
+      supabase.from("location_gift_items").update({ sort_order: current.sort_order }).eq("id", current.id),
+      supabase.from("location_gift_items").update({ sort_order: target.sort_order }).eq("id", target.id),
+    ]);
 
     fetchData();
   };
@@ -147,8 +150,28 @@ export default function AdminItems({ locationId }: Props) {
           return (
             <div
               key={item.id}
-              className="p-4 border rounded shadow bg-white relative flex flex-col gap-2"
+              className="relative p-4 border rounded shadow bg-white flex flex-col gap-2"
             >
+              {/* 정렬 버튼 상단 우측 배치 */}
+              <div className="absolute top-3 right-3 flex gap-2">
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  onClick={() => moveItem(category, index, "up")}
+                  disabled={index === 0}
+                >
+                  <ArrowUp size={16} />
+                </Button>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  onClick={() => moveItem(category, index, "down")}
+                  disabled={index === filtered.length - 1}
+                >
+                  <ArrowDown size={16} />
+                </Button>
+              </div>
+
               {gift?.image_url && (
                 <img
                   src={gift.image_url}
@@ -181,23 +204,6 @@ export default function AdminItems({ locationId }: Props) {
                     중복 선택 허용
                   </label>
                 )}
-
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  onClick={() => moveItem(category, index, "up")}
-                  disabled={index === 0}
-                >
-                  <ArrowUp size={16} />
-                </Button>
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  onClick={() => moveItem(category, index, "down")}
-                  disabled={index === filtered.length - 1}
-                >
-                  <ArrowDown size={16} />
-                </Button>
 
                 <Button
                   size="icon"
