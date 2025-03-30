@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import Modal from "@/components/ui/Modal";
 import AdminItems from "@/modals/AdminItems";
 import GlobalItemManager from "@/pages/GlobalItemManager";
-import GiftPdfGeneratorModal from "@/modals/GiftPdfGeneratorModal";
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -193,7 +192,6 @@ export default function BulkItemManager() {
                 <div key={loc.id} className="border rounded p-4 shadow flex flex-col gap-2">
                   <h4 className="font-semibold text-lg">{loc.name}</h4>
                   <Button onClick={() => handleLocationClick(loc)}>관리</Button>
-                  <Button variant="outline" onClick={() => handlePdfClick(loc)}>📄 안내문 생성</Button>
                 </div>
               ))}
             </div>
@@ -206,15 +204,6 @@ export default function BulkItemManager() {
               </h3>
               <AdminItems locationId={selectedLocation.id} />
             </Modal>
-          )}
-
-          {pdfModalOpen && pdfLocation && (
-            <GiftPdfGeneratorModal
-              locationName={pdfLocation.name}
-              aItems={pdfItems.a}
-              bItems={pdfItems.b}
-              onClose={() => setPdfModalOpen(false)}
-            />
           )}
         </>
       )}
