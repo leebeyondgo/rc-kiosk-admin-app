@@ -27,7 +27,7 @@ export default function AdminRecords() {
   const [locations, setLocations] = useState<Location[]>([]);
   const [selectedLocations, setSelectedLocations] = useState<string[]>([]);
   const [selectedRecords, setSelectedRecords] = useState<Set<string>>(new Set());
-  const [dateRange, setDateRange] = useState({
+  const [dateRange, setDateRange] = useState<{ startDate: string | null; endDate: string | null }>({
     startDate: new Date().toISOString().split("T")[0],
     endDate: new Date().toISOString().split("T")[0],
   });
@@ -123,11 +123,6 @@ export default function AdminRecords() {
         : new Set(filteredRecords.map((r) => r.id))
     );
   };
-
-  const [dateRange, setDateRange] = useState<{ startDate: string | null; endDate: string | null }>({
-    startDate: new Date().toISOString().split("T")[0],
-    endDate: new Date().toISOString().split("T")[0],
-  });
 
   return (
     <div className="max-w-3xl mx-auto p-4 space-y-8">
