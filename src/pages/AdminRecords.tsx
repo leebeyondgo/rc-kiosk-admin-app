@@ -91,6 +91,14 @@ export default function AdminRecords() {
     }
   };
 
+  const toggleRecordSelection = (id: string) => {
+    setSelectedRecords((prev) => {
+      const newSet = new Set(prev);
+      newSet.has(id) ? newSet.delete(id) : newSet.add(id);
+      return newSet;
+    });
+  };
+
   return (
     <div className="max-w-3xl mx-auto p-4 space-y-8">
       <div className="flex flex-col gap-4">
@@ -162,11 +170,44 @@ export default function AdminRecords() {
       {filteredRecords.length === 0 ? (
         <p className="text-gray-500 text-center">기록이 없습니다.</p>
       ) : (
-        filteredRecords.map((record) => (
-          <div key={record.id} className="relative border rounded-lg p-4 bg-white shadow-sm">
-            {/* Record details remain unchanged */}
-          </div>
-        ))
+        filteredRecords.map((record) => {
+          const locationName = locations.find((loc) => loc.id === record.location_id)?.name || "-";
+          return (
+            <div key={record.id} className="relative border rounded-lg p-4 bg-white shadow-sm">
+              <div className="absolute top-3 left-3">
+                <input
+                  type="checkbox"
+                  checked={selectedRecords.has(record.id)}
+                  onChange={() => toggleRecordSelection(record.id)}
+                />
+              </div>
+              <button
+                onClick={() => handleDelete(record.id)}
+                className="absolute top-3 right-3 text-gray-400 hover:text-red-500"
+              >
+                <Trash2 size={16} />
+              </button>
+              <div className="ml-6 mb-1 flex flex-wrap items-center gap-2">
+                <span className="font-semibold text-gray-800">{record.name}</span>
+                <span className="text-xs text-gray-500">
+                  {new Date(record.timestamp || "").toLocaleString("ko-KR", {
+                    year: "2-digit",
+                    month: "2-digit",
+                    day: "2-digit",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </span>
+                <span className="text-xs text-gray-400">({locationName})</span>
+              </div>
+              <ul className="ml-6 list-disc list-inside text-sm text-gray-700 mt-1">
+                {record.items.map((item, i) => (
+                  <li key={i}>{item}</li>
+                ))}
+              </ul>
+            </div>
+          );
+        })
       )}
     </div>
   );
