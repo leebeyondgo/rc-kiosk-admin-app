@@ -5,9 +5,15 @@ import { Button } from "@/components/ui/button";
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-interface Item {
+interface GiftItem {
   id: string;
   name: string;
+  category: string;
+  image_url?: string;
+  sort_order: number;
+  allow_multiple: boolean;
+  visible: boolean;
+  description?: string;
   location_id: string;
 }
 
@@ -16,10 +22,10 @@ interface Location {
   name: string;
 }
 
-export default function BulkItemManager() {
+export default function GiftItemBulkManager() {
   const [locations, setLocations] = useState<Location[]>([]);
   const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
-  const [items, setItems] = useState<Item[]>([]);
+  const [items, setItems] = useState<GiftItem[]>([]);
   const [syncTargets, setSyncTargets] = useState<string[]>([]);
 
   useEffect(() => {
@@ -41,20 +47,40 @@ export default function BulkItemManager() {
   const handleLocationClick = (loc: Location) => {
     setSelectedLocation(loc);
     fetchItems(loc.id);
+    setSyncTargets([]);
   };
 
   const handleSync = async () => {
     if (!selectedLocation) return;
 
-    const sourceItems = items.map((item) => ({ name: item.name }));
+    // 필수 필드 전부 포함
+    const sourceItems = items.map((item) => ({
+      name: item.name,
+      category: item.category,
+      sort_order: item.sort_order ?? 0,
+      allow_multiple: item.allow_multiple ?? false,
+      visible: item.visible ?? true,
+      description: item.description ?? null,
+      image_url: item.image_url ?? null,
+    }));
 
     for (const targetId of syncTargets) {
+      // 기존 아이템 삭제
       await supabase.from("gift_items").delete().eq("location_id", targetId);
-      for (const item of sourceItems) {
-        await supabase.from("gift_items").insert({ ...item, location_id: targetId });
+      // 새로운 아이템 삽입
+      const itemsToInsert = sourceItems.map((item) => ({
+        ...item,
+        location_id: targetId,
+      }));
+      const { error } = await supabase.from("gift_items").insert(itemsToInsert);
+      if (error) {
+        alert(`동기화 실패 (장소 ID: ${targetId})`);
+        console.error(error);
+        return;
       }
     }
-    alert("동기화 완료");
+
+    alert("선택한 장소들과 동기화 완료");
   };
 
   return (
