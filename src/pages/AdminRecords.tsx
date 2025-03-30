@@ -1,47 +1,307 @@
-
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Trash2 } from "lucide-react";
 import { createClient } from "@supabase/supabase-js";
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from "@/lib/supabaseConfig";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+interface GiftRecord {
+  id: string;
+  name: string;
+  items: string[];
+  timestamp?: string;
+  location_id: string;
+}
+
+interface Location {
+  id: string;
+  name: string;
+}
+
 export default function AdminRecords() {
-  const [records, setRecords] = useState<any[]>([]);
+  const [records, setRecords] = useState<GiftRecord[]>([]);
+  const [filteredRecords, setFilteredRecords] = useState<GiftRecord[]>([]);
+  const [locations, setLocations] = useState<Location[]>([]);
+  const [selectedLocations, setSelectedLocations] = useState<string[]>([]);
+  const [selectedRecords, setSelectedRecords] = useState<Set<string>>(new Set());
+  const [startDate, setStartDate] = useState<Date>(new Date());
+  const [endDate, setEndDate] = useState<Date>(new Date());
+  const [dateMode, setDateMode] = useState<'today' | 'range'>('today');
+  const [showLocationDropdown, setShowLocationDropdown] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    fetchRecords();
+    const fetchData = async () => {
+      const { data: recordsData } = await supabase.from("gift_records").select("*");
+      const { data: locationData } = await supabase.from("donation_locations").select("*");
+
+      if (recordsData) {
+        const sorted = (recordsData as GiftRecord[]).sort(
+          (a, b) => new Date(b.timestamp || "").getTime() - new Date(a.timestamp || "").getTime()
+        );
+        setRecords(sorted);
+      } else {
+        setRecords([]);
+      }
+
+      setLocations(locationData ?? []);
+    };
+
+    fetchData();
   }, []);
 
-  const fetchRecords = async () => {
-    const { data, error } = await supabase.from("records").select("*").order("created_at", { ascending: false });
-    if (!error && data) {
-      setRecords(data);
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowLocationDropdown(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  useEffect(() => {
+    const filtered = records.filter((r) => {
+      const matchesLocation =
+        selectedLocations.length === 0 || selectedLocations.includes(r.location_id);
+
+      if (!r.timestamp) return false;
+
+      const recordDate = new Date(r.timestamp);
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+      start.setHours(0, 0, 0, 0);
+      end.setHours(23, 59, 59, 999);
+
+      return matchesLocation && recordDate >= start && recordDate <= end;
+    });
+
+    setFilteredRecords(filtered);
+
+    // 선택된 항목에서 필터링된 것만 유지
+    setSelectedRecords((prev) => {
+      const filteredIds = new Set(filtered.map((r) => r.id));
+      return new Set([...prev].filter((id) => filteredIds.has(id)));
+    });
+  }, [records, selectedLocations, startDate, endDate]);
+
+  const handleDelete = async (id: string) => {
+    if (confirm("정말 삭제하시겠습니까?")) {
+      const { error } = await supabase.from("gift_records").delete().eq("id", id);
+      if (!error) {
+        setRecords((prev) => prev.filter((r) => r.id !== id));
+      } else {
+        alert("삭제 실패");
+      }
     }
   };
 
+  const handleBulkDelete = async () => {
+    if (selectedRecords.size === 0 || !confirm("선택된 항목들을 삭제하시겠습니까?")) return;
+
+    const { error } = await supabase
+      .from("gift_records")
+      .delete()
+      .in("id", Array.from(selectedRecords));
+
+    if (!error) {
+      setRecords((prev) => prev.filter((r) => !selectedRecords.has(r.id)));
+      setSelectedRecords(new Set());
+    } else {
+      alert("일괄 삭제 실패");
+    }
+  };
+
+  const toggleRecordSelection = (id: string) => {
+    setSelectedRecords((prev) => {
+      const newSet = new Set(prev);
+      newSet.has(id) ? newSet.delete(id) : newSet.add(id);
+      return newSet;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedRecords.size === filteredRecords.length) {
+      setSelectedRecords(new Set());
+    } else {
+      setSelectedRecords(new Set(filteredRecords.map((r) => r.id)));
+    }
+  };
+
+  const today = new Date();
+
   return (
-    <div className="bg-white shadow rounded-xl p-6 border border-gray-200">
-      <h2 className="text-xl font-semibold text-gray-800 mb-4">선택 기록 목록</h2>
-      <div className="overflow-auto max-h-[70vh]">
-        <table className="min-w-full">
-          <thead className="bg-gray-100 sticky top-0">
-            <tr>
-              <th className="py-3 px-4 text-left text-sm font-medium text-gray-600">기념품 이름</th>
-              <th className="py-3 px-4 text-left text-sm font-medium text-gray-600">사용자</th>
-              <th className="py-3 px-4 text-left text-sm font-medium text-gray-600">선택 날짜</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-200">
-            {records.map((record) => (
-              <tr key={record.id}>
-                <td className="py-3 px-4 text-sm text-gray-700">{record.item_name}</td>
-                <td className="py-3 px-4 text-sm text-gray-700">{record.user_name}</td>
-                <td className="py-3 px-4 text-sm text-gray-700">{new Date(record.created_at).toLocaleString()}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+    <div className="max-w-3xl mx-auto p-4 space-y-8">
+      <div className="flex flex-col gap-4">
+        {/* 날짜 필터 */}
+        <div className="space-y-2">
+          <div className="flex items-center gap-4">
+            <label className="font-semibold">날짜 선택</label>
+            <label className="flex items-center gap-1">
+              <input
+                type="radio"
+                value="today"
+                checked={dateMode === 'today'}
+                onChange={() => {
+                  setDateMode('today');
+                  setStartDate(today);
+                  setEndDate(today);
+                }}
+              />
+              오늘
+            </label>
+            <label className="flex items-center gap-1">
+              <input
+                type="radio"
+                value="range"
+                checked={dateMode === 'range'}
+                onChange={() => setDateMode('range')}
+              />
+              기간
+            </label>
+          </div>
+          {dateMode === 'range' && (
+            <div className="flex gap-4">
+              <div>
+                <label className="text-sm">시작 날짜</label>
+                <DatePicker selected={startDate} onChange={(date) => setStartDate(date || today)} />
+              </div>
+              <div>
+                <label className="text-sm">종료 날짜</label>
+                <DatePicker selected={endDate} onChange={(date) => setEndDate(date || today)} />
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* 장소 필터 */}
+        <div className="space-y-2" ref={dropdownRef}>
+          <label className="font-semibold">헌혈 장소</label>
+          <div className="relative">
+            <Button onClick={() => setShowLocationDropdown(!showLocationDropdown)} variant="outline">
+              {selectedLocations.length > 0
+                ? `${selectedLocations.length}개 선택됨`
+                : "장소 선택"}
+            </Button>
+            {showLocationDropdown && (
+              <div className="absolute z-10 mt-2 w-full max-h-40 overflow-y-auto border rounded bg-white shadow">
+                {locations.map((loc) => (
+                  <label key={loc.id} className="flex items-center gap-2 p-2">
+                    <input
+                      type="checkbox"
+                      checked={selectedLocations.includes(loc.id)}
+                      onChange={() =>
+                        setSelectedLocations((prev) =>
+                          prev.includes(loc.id)
+                            ? prev.filter((id) => id !== loc.id)
+                            : [...prev, loc.id]
+                        )
+                      }
+                    />
+                    {loc.name}
+                  </label>
+                ))}
+              </div>
+            )}
+          </div>
+          {selectedLocations.length > 0 && (
+            <div className="text-sm text-gray-600">
+              선택됨: {selectedLocations.map((id) => locations.find((l) => l.id === id)?.name).join(", ")}
+            </div>
+          )}
+        </div>
+
+        {/* 컨트롤 버튼 */}
+        <div className="flex justify-between items-center">
+          <Button
+            onClick={() => {
+              setSelectedLocations([]);
+              setDateMode('today');
+              setStartDate(today);
+              setEndDate(today);
+            }}
+            variant="outline"
+          >
+            필터 초기화
+          </Button>
+          <Button onClick={handleBulkDelete} variant="destructive" disabled={selectedRecords.size === 0}>
+            선택 항목 삭제
+          </Button>
+        </div>
+
+        {/* 선택 및 항목 수 */}
+        <div className="flex justify-between items-center text-sm text-gray-500">
+          <label className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              checked={selectedRecords.size === filteredRecords.length && filteredRecords.length > 0}
+              onChange={toggleSelectAll}
+            />
+            전체 선택
+          </label>
+          <span>총 {filteredRecords.length}개 항목</span>
+        </div>
       </div>
+
+      {/* 결과 리스트 */}
+      {filteredRecords.length === 0 ? (
+        <p className="text-gray-500 text-center">기록이 없습니다.</p>
+      ) : (
+        filteredRecords.map((record) => {
+          const locationName = locations.find((loc) => loc.id === record.location_id)?.name || "-";
+
+          let items: string[] = [];
+          try {
+            items = Array.isArray(record.items) ? record.items : JSON.parse(record.items as any);
+          } catch {
+            items = [];
+          }
+
+          return (
+            <div key={record.id} className="relative border rounded-lg p-4 bg-white shadow-sm">
+              <div className="absolute top-3 left-3">
+                <input
+                  type="checkbox"
+                  checked={selectedRecords.has(record.id)}
+                  onChange={() => toggleRecordSelection(record.id)}
+                />
+              </div>
+
+              <button
+                onClick={() => handleDelete(record.id)}
+                className="absolute top-3 right-3 text-gray-400 hover:text-red-500"
+              >
+                <Trash2 size={16} />
+              </button>
+
+              <div className="ml-6 mb-1 flex flex-wrap items-center gap-2">
+                <span className="font-semibold text-gray-800">{record.name}</span>
+                <span className="text-xs text-gray-500">
+                  {new Date(record.timestamp || "").toLocaleString("ko-KR", {
+                    year: "2-digit",
+                    month: "2-digit",
+                    day: "2-digit",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </span>
+                <span className="text-xs text-gray-400">({locationName})</span>
+              </div>
+
+              <ul className="ml-6 list-disc list-inside text-sm text-gray-700 mt-1">
+                {items.length > 0 ? (
+                  items.map((item, i) => <li key={i}>{item}</li>)
+                ) : (
+                  <li className="text-gray-400">선택된 기념품 없음</li>
+                )}
+              </ul>
+            </div>
+          );
+        })
+      )}
     </div>
   );
 }

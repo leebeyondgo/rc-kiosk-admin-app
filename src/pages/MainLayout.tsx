@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -49,7 +48,7 @@ export default function MainLayout() {
       case "bulkItems":
         return "기념품 일괄 관리";
       case "login":
-        return "관리자 로그인";
+        return "";
       default:
         return "기념품 키오스크";
     }
@@ -79,41 +78,100 @@ export default function MainLayout() {
   };
 
   return (
-    <div className="flex min-h-screen relative bg-gray-50" onClick={() => sidebarOpen && setSidebarOpen(false)}>
+    <div
+      className="flex min-h-screen relative"
+      onClick={() => sidebarOpen && setSidebarOpen(false)}
+    >
+      {/* 사이드 메뉴 버튼 */}
       <button
         onClick={(e) => {
           e.stopPropagation();
           setSidebarOpen(!sidebarOpen);
         }}
-        className="fixed top-4 left-4 z-10 p-3 bg-white rounded-lg shadow-lg border border-gray-200"
+        className="fixed top-4 left-4 z-0 p-2 bg-white rounded-full shadow-md"
       >
-        <Menu className="text-gray-700"/>
+        <Menu />
       </button>
 
+      {/* 사이드 메뉴 */}
       <div
-        className={`fixed top-0 left-0 z-20 h-full w-64 bg-white shadow-xl border-r transition-transform duration-300 ease-in-out transform ${
-          sidebarOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
+        className={`
+          fixed top-0 left-0 h-full bg-white shadow-lg z-40 transform 
+          transition-transform duration-300 w-64 p-4 flex flex-col justify-between
+          ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
+        `}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex flex-col p-4 space-y-2">
-          <h2 className="text-lg font-semibold text-gray-700 mb-4">메뉴</h2>
-          <Button variant="ghost" className="justify-start" onClick={() => setActiveTab("selector")}><Gift className="mr-2" />기념품 키오스크</Button>
-          {isAdmin && (
-            <>
-              <Button variant="ghost" className="justify-start" onClick={() => setActiveTab("records")}><ClipboardList className="mr-2" />선택 기록</Button>
-              <Button variant="ghost" className="justify-start" onClick={() => setActiveTab("bulkItems")}><Boxes className="mr-2" />일괄 관리</Button>
-              <Button variant="danger" className="justify-start" onClick={handleLogout}><LogOut className="mr-2" />로그아웃</Button>
-            </>
-          )}
-          {!isAdmin && (
-            <Button variant="outline" className="justify-start" onClick={() => setActiveTab("login")}><LogIn className="mr-2" />관리자 로그인</Button>
+        <div>
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-lg font-bold">메뉴</h2>
+            <button
+              onClick={() => setSidebarOpen(false)}
+              className="text-gray-500 hover:text-black"
+            >
+              &times;
+            </button>
+          </div>
+
+          <div className="space-y-2">
+            <Button
+              variant={activeTab === "selector" ? "default" : "outline"}
+              className="w-full justify-start"
+              onClick={() => setActiveTab("selector")}
+            >
+              <Gift className="mr-2 h-4 w-4" />
+              기념품 키오스크
+            </Button>
+
+            {isAdmin && (
+              <>
+                <Button
+                  variant={activeTab === "records" ? "default" : "outline"}
+                  className="w-full justify-start"
+                  onClick={() => setActiveTab("records")}
+                >
+                  <ClipboardList className="mr-2 h-4 w-4" />
+                  선택 기록
+                </Button>
+                <Button
+                  variant={activeTab === "bulkItems" ? "default" : "outline"}
+                  className="w-full justify-start"
+                  onClick={() => setActiveTab("bulkItems")}
+                >
+                  <Boxes className="mr-2 h-4 w-4" />
+                  기념품 일괄 관리
+                </Button>
+              </>
+            )}
+          </div>
+        </div>
+
+        <div className="pt-4 border-t">
+          {isAdmin ? (
+            <Button
+              variant="outline"
+              className="w-full justify-start"
+              onClick={handleLogout}
+            >
+              <LogOut className="mr-2 h-4 w-4" />
+              로그아웃
+            </Button>
+          ) : (
+            <Button
+              variant={activeTab === "login" ? "default" : "outline"}
+              className="w-full justify-start"
+              onClick={() => setActiveTab("login")}
+            >
+              <LogIn className="mr-2 h-4 w-4" />
+              로그인
+            </Button>
           )}
         </div>
       </div>
 
-      <div className="flex-grow flex flex-col p-6 ml-0 md:ml-64 transition-all duration-300">
-        <h1 className="text-2xl font-bold text-gray-800 mb-4">{renderTitle()}</h1>
+      {/* 본문 영역 */}
+      <div className="flex-1 overflow-auto p-4 w-full">
+        <h1 className="text-2xl font-bold text-center mb-2">{renderTitle()}</h1>
         {renderContent()}
       </div>
     </div>
