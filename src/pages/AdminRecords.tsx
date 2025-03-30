@@ -37,6 +37,9 @@ export default function AdminRecords() {
       const { data: recordsData, error } = await supabase.from("gift_records").select("*");
       const { data: locationData } = await supabase.from("locations").select("*");
 
+      setRecords(recordsData ?? []);
+      setLocations(locationData ?? []);
+
       if (error) {
         console.error("데이터 로드 오류:", error);
       } else if (recordsData) {
@@ -127,14 +130,15 @@ export default function AdminRecords() {
       <div className="flex flex-col gap-4">
         <div>
           <label className="block font-semibold mb-1">날짜 선택</label>
-          <Datepicker
+          {/* 잠시 주석처리하여 문제 확인 */}
+          {/* <Datepicker
             value={dateRange}
             onChange={(value) => setDateRange(value)}
             showShortcuts
             primaryColor="red"
             displayFormat="YYYY-MM-DD"
             separator=" ~ "
-          />
+          /> */}
         </div>
 
         <div>
