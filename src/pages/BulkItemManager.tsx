@@ -2,10 +2,9 @@ import { useEffect, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from "@/lib/supabaseConfig";
 import { Button } from "@/components/ui/button";
-import Modal from "@/components/ui/Modal"; // 추가
+import Modal from "@/components/ui/Modal"; // 모달 컴포넌트가 존재해야 합니다
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-const [showModal, setShowModal] = useState(false); // 추가
 
 interface GiftItem {
   id: string;
@@ -35,6 +34,7 @@ export default function BulkItemManager() {
   const [giftItems, setGiftItems] = useState<GiftItem[]>([]);
   const [locationGiftItems, setLocationGiftItems] = useState<LocationGiftItem[]>([]);
   const [syncTargets, setSyncTargets] = useState<string[]>([]);
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -57,12 +57,14 @@ export default function BulkItemManager() {
   const handleLocationClick = (loc: Location) => {
     setSelectedLocation(loc);
     fetchLocationGiftItems(loc.id);
+    setSyncTargets([]); // ✅ 체크박스 초기화
     setShowModal(true);
   };
 
   const handleSync = async () => {
-    if (!selectedLocation) return;
+    if (!selectedLocation || syncTargets.length === 0) return;
 
+    // 삭제 후 삽입
     const { error: delErr } = await supabase
       .from("location_gift_items")
       .delete()
@@ -72,9 +74,12 @@ export default function BulkItemManager() {
 
     const newData = syncTargets.flatMap((locId) =>
       locationGiftItems.map((item) => ({
-        ...item,
+        gift_item_id: item.gift_item_id,
+        category: item.category,
+        sort_order: item.sort_order,
+        allow_multiple: item.allow_multiple,
+        visible: item.visible,
         location_id: locId,
-        id: undefined, // 새 uuid 생성되게
       }))
     );
 
@@ -82,6 +87,7 @@ export default function BulkItemManager() {
     if (insertErr) return alert("삽입 실패: " + insertErr.message);
 
     alert("동기화 완료");
+    setShowModal(false);
   };
 
   return (
@@ -105,54 +111,54 @@ export default function BulkItemManager() {
             ))}
           </ul>
         </div>
-
-        {showModal && selectedLocation && (
-            <Modal onClose={() => setShowModal(false)}>
-                <h3 className="text-lg font-semibold mb-3">
-                {selectedLocation.name}의 기념품 목록 ({locationGiftItems.length}개)
-                </h3>
-
-                <ul className="list-disc list-inside text-sm mb-4">
-                {locationGiftItems.map((item, i) => {
-                    const base = giftItems.find((g) => g.id === item.gift_item_id);
-                    return (
-                    <li key={i}>
-                        {base?.name || "[삭제됨]"} - {item.category} - 순서 {item.sort_order} -{" "}
-                        중복허용: {item.allow_multiple ? "O" : "X"}
-                    </li>
-                    );
-                })}
-                </ul>
-
-                <div className="mt-4">
-                <label className="font-semibold">동기화 대상 선택</label>
-                <div className="border rounded p-2 max-h-40 overflow-y-auto space-y-1 mt-1">
-                    {locations
-                    .filter((l) => l.id !== selectedLocation.id)
-                    .map((loc) => (
-                        <label key={loc.id} className="flex items-center gap-2">
-                        <input
-                            type="checkbox"
-                            checked={syncTargets.includes(loc.id)}
-                            onChange={() =>
-                            setSyncTargets((prev) =>
-                                prev.includes(loc.id)
-                                ? prev.filter((id) => id !== loc.id)
-                                : [...prev, loc.id]
-                            )
-                            }
-                        />
-                        {loc.name}
-                        </label>
-                    ))}
-                </div>
-                <Button onClick={handleSync} className="mt-3">
-                    선택한 장소들과 동기화
-                </Button>
-                </div>
-            </Modal>
-        )}
       </div>
+
+      {showModal && selectedLocation && (
+        <Modal onClose={() => setShowModal(false)}>
+          <h3 className="text-lg font-semibold mb-3">
+            {selectedLocation.name}의 기념품 목록 ({locationGiftItems.length}개)
+          </h3>
+
+          <ul className="list-disc list-inside text-sm mb-4">
+            {locationGiftItems.map((item, i) => {
+              const base = giftItems.find((g) => g.id === item.gift_item_id);
+              return (
+                <li key={i}>
+                  {base?.name || "[삭제됨]"} - {item.category} - 순서 {item.sort_order} -{" "}
+                  중복허용: {item.allow_multiple ? "O" : "X"}
+                </li>
+              );
+            })}
+          </ul>
+
+          <div className="mt-4">
+            <label className="font-semibold">동기화 대상 선택</label>
+            <div className="border rounded p-2 max-h-40 overflow-y-auto space-y-1 mt-1">
+              {locations
+                .filter((l) => l.id !== selectedLocation.id)
+                .map((loc) => (
+                  <label key={loc.id} className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={syncTargets.includes(loc.id)}
+                      onChange={() =>
+                        setSyncTargets((prev) =>
+                          prev.includes(loc.id)
+                            ? prev.filter((id) => id !== loc.id)
+                            : [...prev, loc.id]
+                        )
+                      }
+                    />
+                    {loc.name}
+                  </label>
+                ))}
+            </div>
+            <Button onClick={handleSync} className="mt-3">
+              선택한 장소들과 동기화
+            </Button>
+          </div>
+        </Modal>
+      )}
     </div>
   );
 }
