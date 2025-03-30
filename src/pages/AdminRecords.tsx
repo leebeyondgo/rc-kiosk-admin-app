@@ -10,7 +10,7 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 interface GiftRecord {
   id: string;
   name: string;
-  items: string[];
+  items: string[] | string;
   timestamp?: string;
   location_id: string;
 }
@@ -44,7 +44,11 @@ export default function AdminRecords() {
       if (error) {
         console.error("데이터 로드 오류:", error);
       } else if (recordsData) {
-        const sorted = (recordsData as GiftRecord[]).sort(
+        const parsed = (recordsData as GiftRecord[]).map((r) => ({
+          ...r,
+          items: typeof r.items === "string" ? JSON.parse(r.items) : r.items,
+        }));
+        const sorted = parsed.sort(
           (a, b) =>
             new Date(b.timestamp || "").getTime() -
             new Date(a.timestamp || "").getTime()
@@ -199,9 +203,11 @@ export default function AdminRecords() {
                 </div>
 
                 <ul className="ml-6 list-disc list-inside text-sm text-gray-700 mt-1">
-                  {record.items.map((item, i) => (
-                    <li key={i}>{item}</li>
-                  ))}
+                  {Array.isArray(record.items) && record.items.length > 0 ? (
+                    record.items.map((item, i) => <li key={i}>{item}</li>)
+                  ) : (
+                    <li className="text-gray-400 italic">선택된 기념품 없음</li>
+                  )}
                 </ul>
               </div>
             );
