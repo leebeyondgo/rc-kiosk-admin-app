@@ -8,13 +8,8 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 interface GiftItem {
   id: string;
   name: string;
-  category: string;
   image_url?: string;
-  sort_order: number;
-  allow_multiple: boolean;
-  visible: boolean;
   description?: string;
-  location_id: string;
 }
 
 interface Location {
@@ -22,69 +17,72 @@ interface Location {
   name: string;
 }
 
-export default function GiftItemBulkManager() {
+interface LocationGiftItem {
+  id: string;
+  location_id: string;
+  gift_item_id: string;
+  category: string;
+  sort_order: number;
+  allow_multiple: boolean;
+  visible: boolean;
+}
+
+export default function BulkItemManager() {
   const [locations, setLocations] = useState<Location[]>([]);
   const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
-  const [items, setItems] = useState<GiftItem[]>([]);
+  const [giftItems, setGiftItems] = useState<GiftItem[]>([]);
+  const [locationGiftItems, setLocationGiftItems] = useState<LocationGiftItem[]>([]);
   const [syncTargets, setSyncTargets] = useState<string[]>([]);
 
   useEffect(() => {
-    const fetchLocations = async () => {
-      const { data } = await supabase.from("donation_locations").select("*");
-      setLocations(data || []);
+    const fetchData = async () => {
+      const { data: locs } = await supabase.from("donation_locations").select("*");
+      const { data: items } = await supabase.from("gift_items").select("*");
+      if (locs) setLocations(locs);
+      if (items) setGiftItems(items);
     };
-    fetchLocations();
+    fetchData();
   }, []);
 
-  const fetchItems = async (locationId: string) => {
+  const fetchLocationGiftItems = async (locationId: string) => {
     const { data } = await supabase
-      .from("gift_items")
+      .from("location_gift_items")
       .select("*")
       .eq("location_id", locationId);
-    setItems(data || []);
+    setLocationGiftItems(data || []);
   };
 
   const handleLocationClick = (loc: Location) => {
     setSelectedLocation(loc);
-    fetchItems(loc.id);
-    setSyncTargets([]);
+    fetchLocationGiftItems(loc.id);
   };
 
   const handleSync = async () => {
     if (!selectedLocation) return;
 
-    // 필수 필드 전부 포함
-    const sourceItems = items.map((item) => ({
-      name: item.name,
-      category: item.category,
-      sort_order: item.sort_order ?? 0,
-      allow_multiple: item.allow_multiple ?? false,
-      visible: item.visible ?? true,
-      description: item.description ?? null,
-      image_url: item.image_url ?? null,
-    }));
+    const { error: delErr } = await supabase
+      .from("location_gift_items")
+      .delete()
+      .in("location_id", syncTargets);
 
-    for (const targetId of syncTargets) {
-      // 기존 아이템 삭제
-      await supabase.from("gift_items").delete().eq("location_id", targetId);
-      // 새로운 아이템 삽입
-      const itemsToInsert = sourceItems.map((item) => ({
+    if (delErr) return alert("삭제 실패: " + delErr.message);
+
+    const newData = syncTargets.flatMap((locId) =>
+      locationGiftItems.map((item) => ({
         ...item,
-        location_id: targetId,
-      }));
-      const { error } = await supabase.from("gift_items").insert(itemsToInsert);
-      if (error) {
-        alert(`동기화 실패 (장소 ID: ${targetId})`);
-        console.error(error);
-        return;
-      }
-    }
+        location_id: locId,
+        id: undefined, // 새 uuid 생성되게
+      }))
+    );
 
-    alert("선택한 장소들과 동기화 완료");
+    const { error: insertErr } = await supabase.from("location_gift_items").insert(newData);
+    if (insertErr) return alert("삽입 실패: " + insertErr.message);
+
+    alert("동기화 완료");
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-4">
+    <div className="max-w-5xl mx-auto p-4">
       <h2 className="text-xl font-bold mb-4">헌혈 장소별 기념품 관리</h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -108,12 +106,18 @@ export default function GiftItemBulkManager() {
         {selectedLocation && (
           <div>
             <h3 className="font-semibold mb-2">
-              {selectedLocation.name}의 기념품 목록 ({items.length}개)
+              {selectedLocation.name}의 기념품 목록 ({locationGiftItems.length}개)
             </h3>
             <ul className="list-disc list-inside text-sm mb-4">
-              {items.map((item) => (
-                <li key={item.id}>{item.name}</li>
-              ))}
+              {locationGiftItems.map((item, i) => {
+                const base = giftItems.find((g) => g.id === item.gift_item_id);
+                return (
+                  <li key={i}>
+                    {base?.name || "[삭제된 기념품]"} - {item.category} -
+                    순서 {item.sort_order} - 중복허용: {item.allow_multiple ? "O" : "X"}
+                  </li>
+                );
+              })}
             </ul>
 
             <div>
