@@ -80,6 +80,12 @@ export default function AdminRecords() {
     });
 
     setFilteredRecords(filtered);
+
+    // 선택된 항목에서 필터링된 것만 유지
+    setSelectedRecords((prev) => {
+      const filteredIds = new Set(filtered.map((r) => r.id));
+      return new Set([...prev].filter((id) => filteredIds.has(id)));
+    });
   }, [records, selectedLocations, startDate, endDate]);
 
   const handleDelete = async (id: string) => {
@@ -115,6 +121,14 @@ export default function AdminRecords() {
       newSet.has(id) ? newSet.delete(id) : newSet.add(id);
       return newSet;
     });
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedRecords.size === filteredRecords.length) {
+      setSelectedRecords(new Set());
+    } else {
+      setSelectedRecords(new Set(filteredRecords.map((r) => r.id)));
+    }
   };
 
   const today = new Date();
@@ -216,6 +230,19 @@ export default function AdminRecords() {
           <Button onClick={handleBulkDelete} variant="destructive" disabled={selectedRecords.size === 0}>
             선택 항목 삭제
           </Button>
+        </div>
+
+        {/* 선택 및 항목 수 */}
+        <div className="flex justify-between items-center text-sm text-gray-500">
+          <label className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              checked={selectedRecords.size === filteredRecords.length && filteredRecords.length > 0}
+              onChange={toggleSelectAll}
+            />
+            전체 선택
+          </label>
+          <span>총 {filteredRecords.length}개 항목</span>
         </div>
       </div>
 
