@@ -7,7 +7,8 @@ import {
   Gift,
   LogIn,
   LogOut,
-  Menu
+  Menu,
+  Boxes
 } from "lucide-react";
 import AdminRecords from "./AdminRecords";
 import AdminItems from "./AdminItems";
@@ -23,7 +24,7 @@ export default function MainLayout() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<
-    "selector" | "records" | "items" | "login"
+    "selector" | "records" | "items" | "bulkItems" | "login"
   >(() => localStorage.getItem("activeTab") as any || "selector");
 
   useEffect(() => {
@@ -46,10 +47,10 @@ export default function MainLayout() {
         return "선택 기록";
       case "items":
         return "상품 관리";
+      case "bulkItems":
+        return "기념품 일괄 관리";
       case "login":
         return "";
-      case "bulkItems":
-        return <BulkItemManager />;
       default:
         return "기념품 선택";
     }
@@ -61,6 +62,8 @@ export default function MainLayout() {
         return <AdminRecords />;
       case "items":
         return <AdminItems />;
+      case "bulkItems":
+        return <BulkItemManager />;
       case "login":
         return (
           <AdminLogin
@@ -81,6 +84,7 @@ export default function MainLayout() {
       className="flex min-h-screen relative"
       onClick={() => sidebarOpen && setSidebarOpen(false)}
     >
+      {/* 사이드 메뉴 버튼 */}
       <button
         onClick={(e) => {
           e.stopPropagation();
@@ -91,12 +95,13 @@ export default function MainLayout() {
         <Menu />
       </button>
 
+      {/* 사이드 메뉴 */}
       <div
-        className={
-          "fixed top-0 left-0 h-full bg-white shadow-lg z-40 transform transition-transform duration-300 " +
-          (sidebarOpen ? "translate-x-0" : "-translate-x-full") +
-          " w-64 p-4 flex flex-col justify-between"
-        }
+        className={`
+          fixed top-0 left-0 h-full bg-white shadow-lg z-40 transform 
+          transition-transform duration-300 w-64 p-4 flex flex-col justify-between
+          ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
+        `}
         onClick={(e) => e.stopPropagation()}
       >
         <div>
@@ -109,14 +114,17 @@ export default function MainLayout() {
               &times;
             </button>
           </div>
+
           <div className="space-y-2">
             <Button
               variant={activeTab === "selector" ? "default" : "outline"}
               className="w-full justify-start"
               onClick={() => setActiveTab("selector")}
             >
-              <Gift className="mr-2 h-4 w-4" />기념품 선택
+              <Gift className="mr-2 h-4 w-4" />
+              기념품 선택
             </Button>
+
             {isAdmin && (
               <>
                 <Button
@@ -124,26 +132,30 @@ export default function MainLayout() {
                   className="w-full justify-start"
                   onClick={() => setActiveTab("records")}
                 >
-                  <ClipboardList className="mr-2 h-4 w-4" />선택 기록
+                  <ClipboardList className="mr-2 h-4 w-4" />
+                  선택 기록
                 </Button>
                 <Button
                   variant={activeTab === "items" ? "default" : "outline"}
                   className="w-full justify-start"
                   onClick={() => setActiveTab("items")}
                 >
-                  <PackageOpen className="mr-2 h-4 w-4" />상품 관리
+                  <PackageOpen className="mr-2 h-4 w-4" />
+                  상품 관리
                 </Button>
                 <Button
                   variant={activeTab === "bulkItems" ? "default" : "outline"}
                   className="w-full justify-start"
                   onClick={() => setActiveTab("bulkItems")}
                 >
-                  <PackageOpen className="mr-2 h-4 w-4" />기념품 일괄 관리
+                  <Boxes className="mr-2 h-4 w-4" />
+                  기념품 일괄 관리
                 </Button>
               </>
             )}
           </div>
         </div>
+
         <div className="pt-4 border-t">
           {isAdmin ? (
             <Button
@@ -151,7 +163,8 @@ export default function MainLayout() {
               className="w-full justify-start"
               onClick={handleLogout}
             >
-              <LogOut className="mr-2 h-4 w-4" />로그아웃
+              <LogOut className="mr-2 h-4 w-4" />
+              로그아웃
             </Button>
           ) : (
             <Button
@@ -159,12 +172,14 @@ export default function MainLayout() {
               className="w-full justify-start"
               onClick={() => setActiveTab("login")}
             >
-              <LogIn className="mr-2 h-4 w-4" />로그인
+              <LogIn className="mr-2 h-4 w-4" />
+              로그인
             </Button>
           )}
         </div>
       </div>
 
+      {/* 본문 영역 */}
       <div className="flex-1 overflow-auto p-4 w-full">
         <h1 className="text-2xl font-bold text-center mb-2">{renderTitle()}</h1>
         {renderContent()}
