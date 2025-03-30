@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
 import { createClient } from "@supabase/supabase-js";
@@ -31,6 +31,7 @@ export default function AdminRecords() {
   const [endDate, setEndDate] = useState<Date>(new Date());
   const [dateMode, setDateMode] = useState<'today' | 'range'>('today');
   const [showLocationDropdown, setShowLocationDropdown] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -50,6 +51,16 @@ export default function AdminRecords() {
     };
 
     fetchData();
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowLocationDropdown(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   useEffect(() => {
@@ -100,10 +111,6 @@ export default function AdminRecords() {
     });
   };
 
-  const formatDateString = (date: Date) => {
-    return date.toISOString().split("T")[0];
-  };
-
   const today = new Date();
 
   return (
@@ -149,7 +156,7 @@ export default function AdminRecords() {
           )}
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-2" ref={dropdownRef}>
           <label className="font-semibold">헌혈 장소</label>
           <div className="relative">
             <Button onClick={() => setShowLocationDropdown(!showLocationDropdown)} variant="outline">
