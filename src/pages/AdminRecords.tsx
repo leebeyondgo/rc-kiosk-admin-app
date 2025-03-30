@@ -3,7 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
 import { createClient } from "@supabase/supabase-js";
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from "@/lib/supabaseConfig";
-import Datepicker from "react-tailwindcss-datepicker";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -20,21 +21,14 @@ interface Location {
   name: string;
 }
 
-interface DateRange {
-  startDate: string | null;
-  endDate: string | null;
-}
-
 export default function AdminRecords() {
   const [records, setRecords] = useState<GiftRecord[]>([]);
   const [filteredRecords, setFilteredRecords] = useState<GiftRecord[]>([]);
   const [locations, setLocations] = useState<Location[]>([]);
   const [selectedLocations, setSelectedLocations] = useState<string[]>([]);
   const [selectedRecords, setSelectedRecords] = useState<Set<string>>(new Set());
-  const [dateRange, setDateRange] = useState<DateRange>({
-    startDate: new Date().toISOString().split("T")[0],
-    endDate: new Date().toISOString().split("T")[0],
-  });
+  const [startDate, setStartDate] = useState<Date>(new Date());
+  const [endDate, setEndDate] = useState<Date>(new Date());
 
   useEffect(() => {
     const fetchData = async () => {
@@ -61,13 +55,13 @@ export default function AdminRecords() {
       const matchesLocation =
         selectedLocations.length === 0 || selectedLocations.includes(r.location_id);
       const date = new Date(r.timestamp || "");
-      const from = new Date(dateRange.startDate || "");
-      const to = new Date(dateRange.endDate || "");
+      const from = new Date(startDate);
+      const to = new Date(endDate);
       to.setHours(23, 59, 59, 999);
       return matchesLocation && date >= from && date <= to;
     });
     setFilteredRecords(filtered);
-  }, [records, selectedLocations, dateRange]);
+  }, [records, selectedLocations, startDate, endDate]);
 
   const handleDelete = async (id: string) => {
     if (confirm("정말 삭제하시겠습니까?")) {
@@ -108,24 +102,12 @@ export default function AdminRecords() {
     <div className="max-w-3xl mx-auto p-4 space-y-8">
       <div className="flex flex-col gap-4">
         <div>
-          <label className="block font-semibold mb-1">날짜 선택</label>
-          <Datepicker
-            value={dateRange}
-            onChange={(newValue) => {
-              if (newValue && typeof newValue === "object") {
-                setDateRange({
-                  startDate: newValue.startDate as string,
-                  endDate: newValue.endDate as string,
-                });
-              } else {
-                setDateRange({ startDate: null, endDate: null });
-              }
-            }}
-            showShortcuts
-            primaryColor="red"
-            displayFormat="YYYY-MM-DD"
-            separator=" ~ "
-          />
+          <label className="block font-semibold mb-1">시작 날짜</label>
+          <DatePicker selected={startDate} onChange={(date) => setStartDate(date as Date)} />
+        </div>
+        <div>
+          <label className="block font-semibold mb-1">종료 날짜</label>
+          <DatePicker selected={endDate} onChange={(date) => setEndDate(date as Date)} />
         </div>
 
         <div>
@@ -151,34 +133,20 @@ export default function AdminRecords() {
         </div>
 
         <div className="flex justify-between items-center">
-          <Button onClick={() => {
-            setSelectedLocations([]);
-            const today = new Date().toISOString().split("T")[0];
-            setDateRange({ startDate: today, endDate: today });
-          }} variant="outline">
+          <Button
+            onClick={() => {
+              setSelectedLocations([]);
+              setStartDate(new Date());
+              setEndDate(new Date());
+            }}
+            variant="outline"
+          >
             필터 초기화
           </Button>
-          <Button
-            onClick={handleBulkDelete}
-            variant="destructive"
-            disabled={selectedRecords.size === 0}
-          >
+          <Button onClick={handleBulkDelete} variant="destructive" disabled={selectedRecords.size === 0}>
             선택 항목 삭제
           </Button>
         </div>
-      </div>
-
-      <div className="text-sm text-gray-500 flex items-center gap-2">
-        <input
-          type="checkbox"
-          checked={selectedRecords.size === filteredRecords.length && filteredRecords.length > 0}
-          onChange={() => setSelectedRecords(
-            selectedRecords.size === filteredRecords.length
-              ? new Set()
-              : new Set(filteredRecords.map((r) => r.id))
-          )}
-        />
-        총 {filteredRecords.length}개 항목
       </div>
 
       {filteredRecords.length === 0 ? (
