@@ -1,22 +1,33 @@
 // components/ui/Modal.tsx
+import { useEffect } from "react";
 
-import { ReactNode } from "react";
-
-export default function Modal({
-  children,
-  onClose,
-}: {
-  children: ReactNode;
+interface Props {
+  children: React.ReactNode;
   onClose: () => void;
-}) {
+}
+
+export default function Modal({ children, onClose }: Props) {
+  useEffect(() => {
+    // 스크롤 막기
+    document.body.style.overflow = "hidden";
+    return () => {
+      // 스크롤 다시 허용
+      document.body.style.overflow = "";
+    };
+  }, []);
+
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-3xl relative">
+    <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4">
+      <div
+        className="bg-white max-h-[90vh] overflow-y-auto rounded-lg w-full max-w-3xl p-6 shadow-lg relative"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* 닫기 버튼 (선택 사항) */}
         <button
+          className="absolute top-3 right-3 text-gray-500 hover:text-black"
           onClick={onClose}
-          className="absolute top-2 right-3 text-gray-500 hover:text-black text-xl"
         >
-          ×
+          ✕
         </button>
         {children}
       </div>
