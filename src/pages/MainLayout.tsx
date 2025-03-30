@@ -106,7 +106,7 @@ export default function MainLayout() {
           />
         );
       default:
-        return <ProductSelector />;
+        return <AdminRecords />;
     }
   };
 
