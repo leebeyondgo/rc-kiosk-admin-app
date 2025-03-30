@@ -4,7 +4,8 @@ import { SUPABASE_URL, SUPABASE_ANON_KEY } from "@/lib/supabaseConfig";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Trash2, Upload } from "lucide-react";
+import { Trash2 } from "lucide-react";
+import ImageSelectorModal from "@/components/ui/ImageSelectorModal"; // 이미지 선택 모달
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -18,8 +19,8 @@ interface GiftItem {
 export default function GlobalItemManager() {
   const [items, setItems] = useState<GiftItem[]>([]);
   const [newItem, setNewItem] = useState<Partial<GiftItem>>({});
-  const [imageFile, setImageFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
+  const [showImageModal, setShowImageModal] = useState(false);
 
   const fetchItems = async () => {
     const { data } = await supabase.from("gift_items").select("*").order("name", { ascending: true });
@@ -38,30 +39,11 @@ export default function GlobalItemManager() {
 
     setLoading(true);
 
-    let image_url = "";
-
-    if (imageFile) {
-      const ext = imageFile.name.split(".").pop();
-      const fileName = `${Date.now()}.${ext}`;
-      const { error: uploadError } = await supabase.storage
-        .from("gift-images")
-        .upload(fileName, imageFile);
-
-      if (uploadError) {
-        alert("이미지 업로드 실패");
-        setLoading(false);
-        return;
-      }
-
-      const { data: urlData } = supabase.storage.from("gift-images").getPublicUrl(fileName);
-      image_url = urlData?.publicUrl ?? "";
-    }
-
     const { error } = await supabase.from("gift_items").insert([
       {
         name: newItem.name,
         description: newItem.description,
-        image_url,
+        image_url: newItem.image_url,
       },
     ]);
 
@@ -69,7 +51,6 @@ export default function GlobalItemManager() {
       alert("추가 실패: " + error.message);
     } else {
       setNewItem({});
-      setImageFile(null);
       fetchItems();
     }
 
@@ -104,15 +85,19 @@ export default function GlobalItemManager() {
           onChange={(e) => setNewItem((prev) => ({ ...prev, description: e.target.value }))}
         />
 
-        <label className="flex items-center gap-2 text-sm text-gray-600">
-          <Upload size={16} />
-          이미지 업로드:
-          <input
-            type="file"
-            accept="image/*"
-            onChange={(e) => setImageFile(e.target.files?.[0] || null)}
-          />
-        </label>
+        <div className="space-y-2">
+          <Button variant="outline" onClick={() => setShowImageModal(true)}>
+            이미지 선택
+          </Button>
+
+          {newItem.image_url && (
+            <img
+              src={newItem.image_url}
+              alt="선택된 이미지"
+              className="w-32 h-20 object-contain border rounded"
+            />
+          )}
+        </div>
 
         <Button onClick={handleAdd} disabled={loading}>
           {loading ? "추가 중..." : "기념품 추가"}
@@ -128,11 +113,20 @@ export default function GlobalItemManager() {
               key={item.id}
               className="flex items-center justify-between border rounded px-4 py-2 bg-white shadow-sm"
             >
-              <div className="flex flex-col">
-                <span className="font-medium">{item.name}</span>
-                {item.description && (
-                  <span className="text-sm text-gray-500">{item.description}</span>
+              <div className="flex items-center gap-3">
+                {item.image_url && (
+                  <img
+                    src={item.image_url}
+                    alt={item.name}
+                    className="w-14 h-14 object-contain rounded border"
+                  />
                 )}
+                <div className="flex flex-col">
+                  <span className="font-medium">{item.name}</span>
+                  {item.description && (
+                    <span className="text-sm text-gray-500">{item.description}</span>
+                  )}
+                </div>
               </div>
               <Button
                 variant="ghost"
@@ -145,6 +139,17 @@ export default function GlobalItemManager() {
           ))}
         </ul>
       </div>
+
+      {/* 이미지 선택 모달 */}
+      {showImageModal && (
+        <ImageSelectorModal
+          onSelect={(url) => {
+            setNewItem((prev) => ({ ...prev, image_url: url }));
+            setShowImageModal(false);
+          }}
+          onClose={() => setShowImageModal(false)}
+        />
+      )}
     </div>
   );
 }
