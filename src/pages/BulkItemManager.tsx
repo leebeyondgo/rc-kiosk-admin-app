@@ -4,7 +4,7 @@ import { SUPABASE_URL, SUPABASE_ANON_KEY } from "@/lib/supabaseConfig";
 import { Button } from "@/components/ui/button";
 import Modal from "@/components/ui/Modal";
 import AdminItems from "@/modals/AdminItems";
-import GlobalItemManager from "@/pages/GlobalItemManager"; // 👈 새로 만들 페이지
+import GlobalItemManager from "@/pages/GlobalItemManager";
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -21,10 +21,15 @@ export default function BulkItemManager() {
   const [showModal, setShowModal] = useState(false);
   const [activeTab, setActiveTab] = useState<Tab>("location");
 
+  // 동기화 관련 상태
+  const [syncMode, setSyncMode] = useState(false);
+  const [syncSourceId, setSyncSourceId] = useState<string>("");
+  const [syncTargetIds, setSyncTargetIds] = useState<string[]>([]);
+
   useEffect(() => {
     const fetchData = async () => {
-      const { data: locs } = await supabase.from("donation_locations").select("*");
-      if (locs) setLocations(locs);
+      const { data } = await supabase.from("donation_locations").select("*");
+      if (data) setLocations(data);
     };
     fetchData();
   }, []);
@@ -34,8 +39,39 @@ export default function BulkItemManager() {
     setShowModal(true);
   };
 
+  const handleSync = async () => {
+    if (!syncSourceId || syncTargetIds.length === 0) return;
+
+    const { data: sourceItems } = await supabase
+      .from("location_gift_items")
+      .select("*")
+      .eq("location_id", syncSourceId);
+
+    if (!sourceItems) return alert("기준 장소 기념품 정보를 불러오지 못했습니다.");
+
+    await supabase.from("location_gift_items")
+      .delete()
+      .in("location_id", syncTargetIds);
+
+    const payload = syncTargetIds.flatMap((targetId) =>
+      sourceItems.map((item) => ({
+        ...item,
+        id: undefined,
+        location_id: targetId,
+      }))
+    );
+
+    const { error } = await supabase.from("location_gift_items").insert(payload);
+    if (error) return alert("동기화 실패: " + error.message);
+
+    alert("동기화가 완료되었습니다.");
+    setSyncMode(false);
+    setSyncSourceId("");
+    setSyncTargetIds([]);
+  };
+
   return (
-    <div className="max-w-5xl mx-auto p-4">
+    <div className="max-w-6xl mx-auto p-4">
       <h2 className="text-xl font-bold mb-4">기념품 관리</h2>
 
       {/* 탭 버튼 */}
@@ -57,24 +93,65 @@ export default function BulkItemManager() {
       {/* 탭 내용 */}
       {activeTab === "location" && (
         <>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <h3 className="font-semibold mb-2">헌혈 장소 목록</h3>
-              <ul className="space-y-1">
-                {locations.map((loc) => (
-                  <li key={loc.id}>
-                    <Button
-                      variant={selectedLocation?.id === loc.id ? "default" : "outline"}
-                      className="w-full justify-start"
-                      onClick={() => handleLocationClick(loc)}
-                    >
-                      {loc.name}
-                    </Button>
-                  </li>
-                ))}
-              </ul>
-            </div>
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="font-semibold text-lg">헌혈 장소 목록</h3>
+            <Button variant="outline" onClick={() => setSyncMode(!syncMode)}>
+              {syncMode ? "동기화 모드 종료" : "동기화 모드"}
+            </Button>
           </div>
+
+          {syncMode ? (
+            <div className="space-y-4 mb-6">
+              <div>
+                <label className="font-semibold">기준 장소</label>
+                <select
+                  className="w-full border rounded px-3 py-2"
+                  value={syncSourceId}
+                  onChange={(e) => setSyncSourceId(e.target.value)}
+                >
+                  <option value="">선택하세요</option>
+                  {locations.map((loc) => (
+                    <option key={loc.id} value={loc.id}>
+                      {loc.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="font-semibold">복사 대상</label>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                  {locations
+                    .filter((l) => l.id !== syncSourceId)
+                    .map((loc) => (
+                      <label key={loc.id} className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          checked={syncTargetIds.includes(loc.id)}
+                          onChange={() =>
+                            setSyncTargetIds((prev) =>
+                              prev.includes(loc.id)
+                                ? prev.filter((id) => id !== loc.id)
+                                : [...prev, loc.id]
+                            )
+                          }
+                        />
+                        {loc.name}
+                      </label>
+                    ))}
+                </div>
+              </div>
+              <Button onClick={handleSync}>동기화 실행</Button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+              {locations.map((loc) => (
+                <div key={loc.id} className="border rounded p-4 shadow flex flex-col gap-2">
+                  <h4 className="font-semibold text-lg">{loc.name}</h4>
+                  <Button onClick={() => handleLocationClick(loc)}>관리</Button>
+                </div>
+              ))}
+            </div>
+          )}
 
           {showModal && selectedLocation && (
             <Modal onClose={() => setShowModal(false)}>
