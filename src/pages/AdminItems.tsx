@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Trash2, GripVertical, Upload } from "lucide-react";
+import { Select } from "@/components/ui/select"; // 직접 구현한 Select 컴포넌트가 있다면
+import { Trash2, GripVertical } from "lucide-react";
 import { createClient } from "@supabase/supabase-js";
 import {
   DragDropContext,
@@ -38,7 +38,8 @@ interface Props {
 export default function AdminItems({ locationId }: Props) {
   const [giftItems, setGiftItems] = useState<GiftItem[]>([]);
   const [locationItems, setLocationItems] = useState<LocationGiftItem[]>([]);
-  const [newItemId, setNewItemId] = useState<string | null>(null);
+  const [newGiftItemId, setNewGiftItemId] = useState<string>("");
+  const [newCategory, setNewCategory] = useState<"A" | "B">("A");
 
   const fetchData = async () => {
     const { data: giftData } = await supabase.from("gift_items").select("*");
@@ -75,13 +76,47 @@ export default function AdminItems({ locationId }: Props) {
     if (error) {
       alert("저장 실패: " + error.message);
     } else {
-      alert("저장 완료");
+      fetchData();
     }
   };
 
   const handleDelete = async (id: string) => {
     if (confirm("정말 삭제하시겠습니까?")) {
       await supabase.from("location_gift_items").delete().eq("id", id);
+      fetchData();
+    }
+  };
+
+  const handleAddItem = async () => {
+    if (!newGiftItemId) return;
+
+    const existing = locationItems.find((i) => i.gift_item_id === newGiftItemId);
+    if (existing) {
+      alert("이미 추가된 기념품입니다.");
+      return;
+    }
+
+    const categoryItems = locationItems
+      .filter((i) => i.category === newCategory)
+      .sort((a, b) => a.sort_order - b.sort_order);
+
+    const nextOrder = categoryItems.length + 1;
+
+    const { error } = await supabase.from("location_gift_items").insert([
+      {
+        location_id: locationId,
+        gift_item_id: newGiftItemId,
+        category: newCategory,
+        sort_order: nextOrder,
+        allow_multiple: false,
+        visible: true,
+      },
+    ]);
+
+    if (error) {
+      alert("추가 실패: " + error.message);
+    } else {
+      setNewGiftItemId("");
       fetchData();
     }
   };
@@ -194,17 +229,46 @@ export default function AdminItems({ locationId }: Props) {
   };
 
   return (
-    <DragDropContext onDragEnd={handleDragEnd}>
-      <div className="space-y-8 mt-4">
-        <div>
-          <h2 className="text-lg font-semibold mb-2">A 품목</h2>
-          {renderCategory("A")}
-        </div>
-        <div>
-          <h2 className="text-lg font-semibold mb-2">B 품목</h2>
-          {renderCategory("B")}
-        </div>
+    <div>
+      {/* 추가 폼 */}
+      <div className="border p-4 rounded mb-6 space-y-3 bg-gray-50">
+        <h3 className="font-semibold text-lg">기념품 추가</h3>
+        <select
+          value={newGiftItemId}
+          onChange={(e) => setNewGiftItemId(e.target.value)}
+          className="border px-3 py-2 rounded w-full"
+        >
+          <option value="">기념품 선택</option>
+          {giftItems.map((item) => (
+            <option key={item.id} value={item.id}>
+              {item.name}
+            </option>
+          ))}
+        </select>
+        <select
+          value={newCategory}
+          onChange={(e) => setNewCategory(e.target.value as "A" | "B")}
+          className="border px-3 py-2 rounded w-full"
+        >
+          <option value="A">A 품목</option>
+          <option value="B">B 품목</option>
+        </select>
+        <Button onClick={handleAddItem}>추가</Button>
       </div>
-    </DragDropContext>
+
+      {/* 기념품 리스트 */}
+      <DragDropContext onDragEnd={handleDragEnd}>
+        <div className="space-y-8 mt-4">
+          <div>
+            <h2 className="text-lg font-semibold mb-2">A 품목</h2>
+            {renderCategory("A")}
+          </div>
+          <div>
+            <h2 className="text-lg font-semibold mb-2">B 품목</h2>
+            {renderCategory("B")}
+          </div>
+        </div>
+      </DragDropContext>
+    </div>
   );
 }
