@@ -1,0 +1,2 @@
+export const SUPABASE_URL = "https://wwiegtmgixlfoueiaeax.supabase.co";
+export const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind3aWVndG1naXhsZm91ZWlhZWF4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI3MDg5NzAsImV4cCI6MjA1ODI4NDk3MH0.4TpNPYZ24_yS9udVf6h9wIAxE5lBvK6j7igYT41CElQ";
