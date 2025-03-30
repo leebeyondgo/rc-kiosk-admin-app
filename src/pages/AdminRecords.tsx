@@ -34,21 +34,14 @@ export default function AdminRecords() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const { data: recordsData, error } = await supabase
-        .from("gift_records")
-        .select("*");
-
-      const { data: locationData } = await supabase
-        .from("locations")
-        .select("*");
+      const { data: recordsData, error } = await supabase.from("gift_records").select("*");
+      const { data: locationData } = await supabase.from("locations").select("*");
 
       if (error) {
         console.error("데이터 로드 오류:", error);
       } else if (recordsData) {
         const sorted = (recordsData as GiftRecord[]).sort(
-          (a, b) =>
-            new Date(b.timestamp || "").getTime() -
-            new Date(a.timestamp || "").getTime()
+          (a, b) => new Date(b.timestamp || "").getTime() - new Date(a.timestamp || "").getTime()
         );
         setRecords(sorted);
       }
@@ -86,10 +79,12 @@ export default function AdminRecords() {
   const handleBulkDelete = async () => {
     if (selectedRecords.size === 0) return;
     if (!confirm("선택된 항목들을 삭제하시겠습니까?")) return;
+
     const { error } = await supabase
       .from("gift_records")
       .delete()
       .in("id", Array.from(selectedRecords));
+
     if (!error) {
       setRecords((prev) => prev.filter((r) => !selectedRecords.has(r.id)));
       setSelectedRecords(new Set());
@@ -113,22 +108,21 @@ export default function AdminRecords() {
   const toggleRecordSelection = (id: string) => {
     setSelectedRecords((prev) => {
       const newSet = new Set(prev);
-      if (newSet.has(id)) newSet.delete(id);
-      else newSet.add(id);
+      newSet.has(id) ? newSet.delete(id) : newSet.add(id);
       return newSet;
     });
   };
 
   const toggleSelectAll = () => {
-    if (selectedRecords.size === filteredRecords.length) {
-      setSelectedRecords(new Set());
-    } else {
-      setSelectedRecords(new Set(filteredRecords.map((r) => r.id)));
-    }
+    setSelectedRecords(
+      selectedRecords.size === filteredRecords.length
+        ? new Set()
+        : new Set(filteredRecords.map((r) => r.id))
+    );
   };
 
   return (
-    <div className="max-w-3xl mx-auto p-6 space-y-8">
+    <div className="max-w-3xl mx-auto p-4 space-y-8">
       {/* 필터 섹션 */}
       <div className="flex flex-col gap-4">
         <div>
@@ -136,7 +130,7 @@ export default function AdminRecords() {
           <Datepicker
             value={dateRange}
             onChange={(value) => setDateRange(value)}
-            showShortcuts={true}
+            showShortcuts
             primaryColor="red"
             displayFormat="YYYY-MM-DD"
             separator=" ~ "
@@ -163,7 +157,11 @@ export default function AdminRecords() {
           <Button onClick={handleResetFilters} variant="outline">
             필터 초기화
           </Button>
-          <Button onClick={handleBulkDelete} variant="destructive" disabled={selectedRecords.size === 0}>
+          <Button
+            onClick={handleBulkDelete}
+            variant="destructive"
+            disabled={selectedRecords.size === 0}
+          >
             선택 항목 삭제
           </Button>
         </div>
@@ -173,7 +171,9 @@ export default function AdminRecords() {
       <div className="text-sm text-gray-500 flex items-center gap-2">
         <input
           type="checkbox"
-          checked={selectedRecords.size === filteredRecords.length && filteredRecords.length > 0}
+          checked={
+            selectedRecords.size === filteredRecords.length && filteredRecords.length > 0
+          }
           onChange={toggleSelectAll}
         />
         총 {filteredRecords.length}개 항목
