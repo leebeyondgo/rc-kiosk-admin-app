@@ -4,8 +4,9 @@ import { SUPABASE_URL, SUPABASE_ANON_KEY } from "@/lib/supabaseConfig";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Trash2 } from "lucide-react";
-import ImageSelectorModal from "@/modals/ImageSelectorModal"; // 이미지 선택 모달
+import { Trash2, Pencil } from "lucide-react";
+import ImageSelectorModal from "@/modals/ImageSelectorModal";
+import Modal from "@/components/ui/Modal";
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -21,6 +22,8 @@ export default function GlobalItemManager() {
   const [newItem, setNewItem] = useState<Partial<GiftItem>>({});
   const [loading, setLoading] = useState(false);
   const [showImageModal, setShowImageModal] = useState(false);
+  const [editingItem, setEditingItem] = useState<GiftItem | null>(null);
+  const [showEditModal, setShowEditModal] = useState(false);
 
   const fetchItems = async () => {
     const { data } = await supabase.from("gift_items").select("*").order("name", { ascending: true });
@@ -39,13 +42,11 @@ export default function GlobalItemManager() {
 
     setLoading(true);
 
-    const { error } = await supabase.from("gift_items").insert([
-      {
-        name: newItem.name,
-        description: newItem.description,
-        image_url: newItem.image_url,
-      },
-    ]);
+    const { error } = await supabase.from("gift_items").insert([{
+      name: newItem.name,
+      description: newItem.description,
+      image_url: newItem.image_url,
+    }]);
 
     if (error) {
       alert("추가 실패: " + error.message);
@@ -63,6 +64,27 @@ export default function GlobalItemManager() {
     if (error) {
       alert("삭제 실패: " + error.message);
     } else {
+      fetchItems();
+    }
+  };
+
+  const handleEditSave = async () => {
+    if (!editingItem) return;
+
+    const { error } = await supabase
+      .from("gift_items")
+      .update({
+        name: editingItem.name,
+        description: editingItem.description,
+        image_url: editingItem.image_url,
+      })
+      .eq("id", editingItem.id);
+
+    if (error) {
+      alert("수정 실패: " + error.message);
+    } else {
+      setShowEditModal(false);
+      setEditingItem(null);
       fetchItems();
     }
   };
@@ -128,19 +150,30 @@ export default function GlobalItemManager() {
                   )}
                 </div>
               </div>
-              <Button
-                variant="ghost"
-                onClick={() => handleDelete(item.id)}
-                className="text-red-500"
-              >
-                <Trash2 size={16} />
-              </Button>
+              <div className="flex gap-2">
+                <Button
+                  variant="ghost"
+                  onClick={() => {
+                    setEditingItem(item);
+                    setShowEditModal(true);
+                  }}
+                >
+                  <Pencil size={16} />
+                </Button>
+                <Button
+                  variant="ghost"
+                  onClick={() => handleDelete(item.id)}
+                  className="text-red-500"
+                >
+                  <Trash2 size={16} />
+                </Button>
+              </div>
             </li>
           ))}
         </ul>
       </div>
 
-      {/* 이미지 선택 모달 */}
+      {/* 이미지 선택 모달 (추가용) */}
       {showImageModal && (
         <ImageSelectorModal
           onSelect={(url) => {
@@ -149,6 +182,60 @@ export default function GlobalItemManager() {
           }}
           onClose={() => setShowImageModal(false)}
         />
+      )}
+
+      {/* 수정용 모달 */}
+      {showEditModal && editingItem && (
+        <Modal onClose={() => setShowEditModal(false)}>
+          <h3 className="text-lg font-semibold mb-4">기념품 편집</h3>
+
+          <Input
+            value={editingItem.name}
+            onChange={(e) =>
+              setEditingItem({ ...editingItem, name: e.target.value })
+            }
+            placeholder="이름"
+          />
+
+          <Textarea
+            value={editingItem.description ?? ""}
+            onChange={(e) =>
+              setEditingItem({ ...editingItem, description: e.target.value })
+            }
+            placeholder="설명"
+            className="mt-2"
+          />
+
+          <div className="my-2 space-y-2">
+            <Button variant="outline" onClick={() => setShowImageModal(true)}>
+              이미지 선택
+            </Button>
+            {editingItem.image_url && (
+              <img
+                src={editingItem.image_url}
+                className="w-32 h-20 object-contain border rounded"
+              />
+            )}
+          </div>
+
+          <div className="mt-4 flex justify-end gap-2">
+            <Button variant="ghost" onClick={() => setShowEditModal(false)}>
+              취소
+            </Button>
+            <Button onClick={handleEditSave}>저장</Button>
+          </div>
+
+          {/* 이미지 선택 모달 (편집용) */}
+          {showImageModal && (
+            <ImageSelectorModal
+              onSelect={(url) => {
+                setEditingItem((prev) => (prev ? { ...prev, image_url: url } : null));
+                setShowImageModal(false);
+              }}
+              onClose={() => setShowImageModal(false)}
+            />
+          )}
+        </Modal>
       )}
     </div>
   );
