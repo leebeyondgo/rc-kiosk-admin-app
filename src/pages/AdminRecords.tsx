@@ -29,6 +29,8 @@ export default function AdminRecords() {
   const [selectedRecords, setSelectedRecords] = useState<Set<string>>(new Set());
   const [startDate, setStartDate] = useState<Date>(new Date());
   const [endDate, setEndDate] = useState<Date>(new Date());
+  const [dateMode, setDateMode] = useState<'today' | 'range'>('today');
+  const [showLocationDropdown, setShowLocationDropdown] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -54,11 +56,11 @@ export default function AdminRecords() {
     const filtered = records.filter((r) => {
       const matchesLocation =
         selectedLocations.length === 0 || selectedLocations.includes(r.location_id);
-      const date = new Date(r.timestamp || "");
+      const recordDate = new Date(r.timestamp || "");
       const from = new Date(startDate);
       const to = new Date(endDate);
       to.setHours(23, 59, 59, 999);
-      return matchesLocation && date >= from && date <= to;
+      return matchesLocation && recordDate >= from && recordDate <= to;
     });
     setFilteredRecords(filtered);
   }, [records, selectedLocations, startDate, endDate]);
@@ -98,46 +100,98 @@ export default function AdminRecords() {
     });
   };
 
+  const formatDateString = (date: Date) => {
+    return date.toISOString().split("T")[0];
+  };
+
+  const today = new Date();
+
   return (
     <div className="max-w-3xl mx-auto p-4 space-y-8">
       <div className="flex flex-col gap-4">
-        <div>
-          <label className="block font-semibold mb-1">시작 날짜</label>
-          <DatePicker selected={startDate} onChange={(date) => setStartDate(date as Date)} />
-        </div>
-        <div>
-          <label className="block font-semibold mb-1">종료 날짜</label>
-          <DatePicker selected={endDate} onChange={(date) => setEndDate(date as Date)} />
+        <div className="space-y-2">
+          <div className="flex items-center gap-4">
+            <label className="font-semibold">날짜 선택</label>
+            <label className="flex items-center gap-1">
+              <input
+                type="radio"
+                value="today"
+                checked={dateMode === 'today'}
+                onChange={() => {
+                  setDateMode('today');
+                  setStartDate(today);
+                  setEndDate(today);
+                }}
+              />
+              당일
+            </label>
+            <label className="flex items-center gap-1">
+              <input
+                type="radio"
+                value="range"
+                checked={dateMode === 'range'}
+                onChange={() => setDateMode('range')}
+              />
+              기간
+            </label>
+          </div>
+          {dateMode === 'range' && (
+            <div className="flex gap-4">
+              <div>
+                <label className="text-sm">시작 날짜</label>
+                <DatePicker selected={startDate} onChange={(date) => setStartDate(date || today)} />
+              </div>
+              <div>
+                <label className="text-sm">종료 날짜</label>
+                <DatePicker selected={endDate} onChange={(date) => setEndDate(date || today)} />
+              </div>
+            </div>
+          )}
         </div>
 
-        <div>
-          <label className="block font-semibold mb-1">헌혈 장소</label>
-          <div className="border rounded p-2 max-h-40 overflow-y-auto space-y-1">
-            {locations.map((loc) => (
-              <label key={loc.id} className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={selectedLocations.includes(loc.id)}
-                  onChange={() =>
-                    setSelectedLocations((prev) =>
-                      prev.includes(loc.id)
-                        ? prev.filter((id) => id !== loc.id)
-                        : [...prev, loc.id]
-                    )
-                  }
-                />
-                {loc.name}
-              </label>
-            ))}
+        <div className="space-y-2">
+          <label className="font-semibold">헌혈 장소</label>
+          <div className="relative">
+            <Button onClick={() => setShowLocationDropdown(!showLocationDropdown)} variant="outline">
+              {selectedLocations.length > 0
+                ? `${selectedLocations.length}개 선택됨`
+                : "장소 선택"}
+            </Button>
+            {showLocationDropdown && (
+              <div className="absolute z-10 mt-2 w-full max-h-40 overflow-y-auto border rounded bg-white shadow">
+                {locations.map((loc) => (
+                  <label key={loc.id} className="flex items-center gap-2 p-2">
+                    <input
+                      type="checkbox"
+                      checked={selectedLocations.includes(loc.id)}
+                      onChange={() =>
+                        setSelectedLocations((prev) =>
+                          prev.includes(loc.id)
+                            ? prev.filter((id) => id !== loc.id)
+                            : [...prev, loc.id]
+                        )
+                      }
+                    />
+                    {loc.name}
+                  </label>
+                ))}
+              </div>
+            )}
           </div>
+          {selectedLocations.length > 0 && (
+            <div className="text-sm text-gray-600">
+              선택됨: {selectedLocations.map((id) => locations.find((l) => l.id === id)?.name).join(", ")}
+            </div>
+          )}
         </div>
 
         <div className="flex justify-between items-center">
           <Button
             onClick={() => {
               setSelectedLocations([]);
-              setStartDate(new Date());
-              setEndDate(new Date());
+              setDateMode('today');
+              setStartDate(today);
+              setEndDate(today);
             }}
             variant="outline"
           >
