@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
 import { createClient } from "@supabase/supabase-js";
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from "@/lib/supabaseConfig";
-import Datepicker, { DateValueType } from "react-tailwindcss-datepicker";
+import Datepicker from "react-tailwindcss-datepicker";
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -20,13 +20,18 @@ interface Location {
   name: string;
 }
 
+interface DateRange {
+  startDate: string | null;
+  endDate: string | null;
+}
+
 export default function AdminRecords() {
   const [records, setRecords] = useState<GiftRecord[]>([]);
   const [filteredRecords, setFilteredRecords] = useState<GiftRecord[]>([]);
   const [locations, setLocations] = useState<Location[]>([]);
   const [selectedLocations, setSelectedLocations] = useState<string[]>([]);
   const [selectedRecords, setSelectedRecords] = useState<Set<string>>(new Set());
-  const [dateRange, setDateRange] = useState<DateValueType>({
+  const [dateRange, setDateRange] = useState<DateRange>({
     startDate: new Date().toISOString().split("T")[0],
     endDate: new Date().toISOString().split("T")[0],
   });
@@ -56,8 +61,8 @@ export default function AdminRecords() {
       const matchesLocation =
         selectedLocations.length === 0 || selectedLocations.includes(r.location_id);
       const date = new Date(r.timestamp || "");
-      const from = new Date(dateRange?.startDate || "");
-      const to = new Date(dateRange?.endDate || "");
+      const from = new Date(dateRange.startDate || "");
+      const to = new Date(dateRange.endDate || "");
       to.setHours(23, 59, 59, 999);
       return matchesLocation && date >= from && date <= to;
     });
@@ -106,7 +111,16 @@ export default function AdminRecords() {
           <label className="block font-semibold mb-1">날짜 선택</label>
           <Datepicker
             value={dateRange}
-            onChange={(newValue: DateValueType) => setDateRange(newValue)}
+            onChange={(newValue) => {
+              if (newValue && typeof newValue === "object") {
+                setDateRange({
+                  startDate: newValue.startDate as string,
+                  endDate: newValue.endDate as string,
+                });
+              } else {
+                setDateRange({ startDate: null, endDate: null });
+              }
+            }}
             showShortcuts
             primaryColor="red"
             displayFormat="YYYY-MM-DD"
@@ -170,44 +184,11 @@ export default function AdminRecords() {
       {filteredRecords.length === 0 ? (
         <p className="text-gray-500 text-center">기록이 없습니다.</p>
       ) : (
-        filteredRecords.map((record) => {
-          const locationName = locations.find((loc) => loc.id === record.location_id)?.name || "-";
-          return (
-            <div key={record.id} className="relative border rounded-lg p-4 bg-white shadow-sm">
-              <div className="absolute top-3 left-3">
-                <input
-                  type="checkbox"
-                  checked={selectedRecords.has(record.id)}
-                  onChange={() => toggleRecordSelection(record.id)}
-                />
-              </div>
-              <button
-                onClick={() => handleDelete(record.id)}
-                className="absolute top-3 right-3 text-gray-400 hover:text-red-500"
-              >
-                <Trash2 size={16} />
-              </button>
-              <div className="ml-6 mb-1 flex flex-wrap items-center gap-2">
-                <span className="font-semibold text-gray-800">{record.name}</span>
-                <span className="text-xs text-gray-500">
-                  {new Date(record.timestamp || "").toLocaleString("ko-KR", {
-                    year: "2-digit",
-                    month: "2-digit",
-                    day: "2-digit",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                </span>
-                <span className="text-xs text-gray-400">({locationName})</span>
-              </div>
-              <ul className="ml-6 list-disc list-inside text-sm text-gray-700 mt-1">
-                {record.items.map((item, i) => (
-                  <li key={i}>{item}</li>
-                ))}
-              </ul>
-            </div>
-          );
-        })
+        filteredRecords.map((record) => (
+          <div key={record.id} className="relative border rounded-lg p-4 bg-white shadow-sm">
+            <div className="ml-6 font-semibold text-gray-800">{record.name}</div>
+          </div>
+        ))
       )}
     </div>
   );
