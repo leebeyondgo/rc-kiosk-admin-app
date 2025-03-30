@@ -35,7 +35,7 @@ export default function AdminRecords() {
   useEffect(() => {
     const fetchData = async () => {
       const { data: recordsData, error } = await supabase.from("gift_records").select("*");
-      const { data: locationData } = await supabase.from("locations").select("*");
+      const { data: locationData } = await supabase.from("donation_locations").select("*");
 
       setRecords(recordsData ?? []);
       setLocations(locationData ?? []);
