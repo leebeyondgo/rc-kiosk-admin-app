@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import { GripVertical } from "lucide-react";
 import { createClient } from "@supabase/supabase-js";
 import {
@@ -16,6 +17,7 @@ interface GiftItem {
   id: string;
   name: string;
   image_url?: string;
+  description?: string;
 }
 
 interface LocationGiftItem {
@@ -35,7 +37,7 @@ interface Props {
 export default function AdminItems({ locationId }: Props) {
   const [giftItems, setGiftItems] = useState<GiftItem[]>([]);
   const [locationItems, setLocationItems] = useState<LocationGiftItem[]>([]);
-  const [newGiftItemId, setNewGiftItemId] = useState("");
+  const [newGiftItemId, setNewGiftItemId] = useState<string>("");
   const [newCategory, setNewCategory] = useState<"A" | "B">("A");
 
   const fetchData = async () => {
@@ -53,18 +55,23 @@ export default function AdminItems({ locationId }: Props) {
     fetchData();
   }, [locationId]);
 
-  const handleToggle = async (id: string, field: keyof LocationGiftItem, value: boolean) => {
+  const handleFieldChange = async (
+    id: string,
+    field: keyof LocationGiftItem,
+    value: any
+  ) => {
+    const updated = locationItems.map((item) =>
+      item.id === id ? { ...item, [field]: value } : item
+    );
+    setLocationItems(updated);
+
     const { error } = await supabase
       .from("location_gift_items")
       .update({ [field]: value })
       .eq("id", id);
 
-    if (!error) {
-      setLocationItems((prev) =>
-        prev.map((item) =>
-          item.id === id ? { ...item, [field]: value } : item
-        )
-      );
+    if (error) {
+      alert("변경 저장 실패: " + error.message);
     }
   };
 
@@ -78,10 +85,8 @@ export default function AdminItems({ locationId }: Props) {
   const handleAddItem = async () => {
     if (!newGiftItemId) return;
 
-    const alreadyExists = locationItems.some(
-      (i) => i.gift_item_id === newGiftItemId
-    );
-    if (alreadyExists) {
+    const existing = locationItems.find((i) => i.gift_item_id === newGiftItemId);
+    if (existing) {
       alert("이미 추가된 기념품입니다.");
       return;
     }
@@ -103,7 +108,9 @@ export default function AdminItems({ locationId }: Props) {
       },
     ]);
 
-    if (!error) {
+    if (error) {
+      alert("추가 실패: " + error.message);
+    } else {
       setNewGiftItemId("");
       fetchData();
     }
@@ -114,15 +121,15 @@ export default function AdminItems({ locationId }: Props) {
     if (!destination) return;
 
     const category = result.type as "A" | "B";
-    const categoryItems = [...locationItems]
+    const sorted = [...locationItems]
       .filter((i) => i.category === category)
       .sort((a, b) => a.sort_order - b.sort_order);
 
-    const [moved] = categoryItems.splice(source.index, 1);
-    categoryItems.splice(destination.index, 0, moved);
+    const [movedItem] = sorted.splice(source.index, 1);
+    sorted.splice(destination.index, 0, movedItem);
 
     await Promise.all(
-      categoryItems.map((item, index) =>
+      sorted.map((item, index) =>
         supabase
           .from("location_gift_items")
           .update({ sort_order: index + 1 })
@@ -141,7 +148,11 @@ export default function AdminItems({ locationId }: Props) {
     return (
       <Droppable droppableId={category} type={category}>
         {(provided) => (
-          <div ref={provided.innerRef} {...provided.droppableProps} className="space-y-4">
+          <div
+            ref={provided.innerRef}
+            {...provided.droppableProps}
+            className="space-y-4"
+          >
             {filtered.map((item, index) => {
               const gift = giftItems.find((g) => g.id === item.gift_item_id);
 
@@ -151,52 +162,60 @@ export default function AdminItems({ locationId }: Props) {
                     <div
                       ref={provided.innerRef}
                       {...provided.draggableProps}
-                      className="p-4 border rounded shadow bg-white relative flex flex-col"
+                      className="p-4 border rounded shadow bg-white relative"
                     >
-                      <div className="flex items-center gap-4">
-                        <div {...provided.dragHandleProps} className="text-gray-400 cursor-grab">
-                          <GripVertical size={16} />
-                        </div>
+                      <div
+                        {...provided.dragHandleProps}
+                        className="absolute left-2 top-2 text-gray-400 cursor-grab"
+                      >
+                        <GripVertical size={16} />
+                      </div>
+
+                      <div className="ml-6 space-y-2">
                         {gift?.image_url && (
                           <img
                             src={gift.image_url}
                             alt={gift.name}
-                            className="w-24 h-16 object-contain rounded"
+                            className="w-full max-w-xs aspect-[2/1] object-contain rounded"
                           />
                         )}
                         <div className="text-base font-semibold">{gift?.name ?? "알 수 없음"}</div>
-                      </div>
 
-                      <div className="flex gap-4 mt-2 text-sm">
-                        <label>
-                          <input
-                            type="checkbox"
-                            checked={item.visible}
-                            onChange={() =>
-                              handleToggle(item.id, "visible", !item.visible)
-                            }
-                          />{" "}
-                          사용자에게 보임
-                        </label>
-                        {item.category === "A" && (
+                        <div className="text-sm flex gap-4">
                           <label>
                             <input
                               type="checkbox"
-                              checked={item.allow_multiple}
+                              checked={item.visible}
                               onChange={() =>
-                                handleToggle(item.id, "allow_multiple", !item.allow_multiple)
+                                handleFieldChange(item.id, "visible", !item.visible)
                               }
-                            />{" "}
-                            중복 선택 허용
+                            />
+                            사용자에게 보임
                           </label>
-                        )}
-                        <Button
-                          variant="ghost"
-                          className="text-red-500 ml-auto"
-                          onClick={() => handleDelete(item.id)}
-                        >
-                          삭제
-                        </Button>
+                          {item.category === "A" && (
+                            <label>
+                              <input
+                                type="checkbox"
+                                checked={item.allow_multiple}
+                                onChange={() =>
+                                  handleFieldChange(
+                                    item.id,
+                                    "allow_multiple",
+                                    !item.allow_multiple
+                                  )
+                                }
+                              />
+                              중복 선택 허용
+                            </label>
+                          )}
+                          <Button
+                            variant="ghost"
+                            className="text-red-500 ml-auto"
+                            onClick={() => handleDelete(item.id)}
+                          >
+                            삭제
+                          </Button>
+                        </div>
                       </div>
                     </div>
                   )}
@@ -212,7 +231,7 @@ export default function AdminItems({ locationId }: Props) {
 
   return (
     <div>
-      {/* ➕ 기념품 추가 폼 */}
+      {/* 추가 폼 */} {/* ✅ 복구된 추가 영역 */}
       <div className="border p-4 rounded mb-6 space-y-3 bg-gray-50">
         <h3 className="font-semibold text-lg">기념품 추가</h3>
         <select
@@ -238,7 +257,7 @@ export default function AdminItems({ locationId }: Props) {
         <Button onClick={handleAddItem}>추가</Button>
       </div>
 
-      {/* 🔀 정렬 리스트 */}
+      {/* 드래그 리스트 */}
       <DragDropContext onDragEnd={handleDragEnd}>
         <div className="space-y-8 mt-4">
           <div>
