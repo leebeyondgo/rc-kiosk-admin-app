@@ -50,7 +50,7 @@ export default function MainLayout() {
       case "login":
         return "";
       default:
-        return "기념품 선택";
+        return "기념품 키오스크";
     }
   };
 
@@ -120,7 +120,7 @@ export default function MainLayout() {
               onClick={() => setActiveTab("selector")}
             >
               <Gift className="mr-2 h-4 w-4" />
-              기념품 선택
+              기념품 키오스크
             </Button>
 
             {isAdmin && (

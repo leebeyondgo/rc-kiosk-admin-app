@@ -91,7 +91,6 @@ export default function BulkItemManager() {
 
   return (
     <div className="max-w-6xl mx-auto p-4">
-      <h2 className="text-xl font-bold mb-4">기념품 관리</h2>
 
       {/* 탭 버튼 */}
       <div className="flex border-b mb-4 space-x-2">
