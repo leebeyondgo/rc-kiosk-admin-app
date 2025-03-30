@@ -2,92 +2,32 @@ import { useEffect, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from "@/lib/supabaseConfig";
 import { Button } from "@/components/ui/button";
-import Modal from "@/components/ui/Modal"; // 모달 컴포넌트가 존재해야 합니다
+import Modal from "@/components/ui/Modal";
+import AdminItems from "@/pages/AdminItems";
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-interface GiftItem {
-  id: string;
-  name: string;
-  image_url?: string;
-  description?: string;
-}
 
 interface Location {
   id: string;
   name: string;
 }
 
-interface LocationGiftItem {
-  id: string;
-  location_id: string;
-  gift_item_id: string;
-  category: string;
-  sort_order: number;
-  allow_multiple: boolean;
-  visible: boolean;
-}
-
 export default function BulkItemManager() {
   const [locations, setLocations] = useState<Location[]>([]);
   const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
-  const [giftItems, setGiftItems] = useState<GiftItem[]>([]);
-  const [locationGiftItems, setLocationGiftItems] = useState<LocationGiftItem[]>([]);
-  const [syncTargets, setSyncTargets] = useState<string[]>([]);
   const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
       const { data: locs } = await supabase.from("donation_locations").select("*");
-      const { data: items } = await supabase.from("gift_items").select("*");
       if (locs) setLocations(locs);
-      if (items) setGiftItems(items);
     };
     fetchData();
   }, []);
 
-  const fetchLocationGiftItems = async (locationId: string) => {
-    const { data } = await supabase
-      .from("location_gift_items")
-      .select("*")
-      .eq("location_id", locationId);
-    setLocationGiftItems(data || []);
-  };
-
   const handleLocationClick = (loc: Location) => {
     setSelectedLocation(loc);
-    fetchLocationGiftItems(loc.id);
-    setSyncTargets([]); // ✅ 체크박스 초기화
     setShowModal(true);
-  };
-
-  const handleSync = async () => {
-    if (!selectedLocation || syncTargets.length === 0) return;
-
-    // 삭제 후 삽입
-    const { error: delErr } = await supabase
-      .from("location_gift_items")
-      .delete()
-      .in("location_id", syncTargets);
-
-    if (delErr) return alert("삭제 실패: " + delErr.message);
-
-    const newData = syncTargets.flatMap((locId) =>
-      locationGiftItems.map((item) => ({
-        gift_item_id: item.gift_item_id,
-        category: item.category,
-        sort_order: item.sort_order,
-        allow_multiple: item.allow_multiple,
-        visible: item.visible,
-        location_id: locId,
-      }))
-    );
-
-    const { error: insertErr } = await supabase.from("location_gift_items").insert(newData);
-    if (insertErr) return alert("삽입 실패: " + insertErr.message);
-
-    alert("동기화 완료");
-    setShowModal(false);
   };
 
   return (
@@ -112,53 +52,43 @@ export default function BulkItemManager() {
           </ul>
         </div>
       </div>
-
-      {showModal && selectedLocation && (
+        {showModal && selectedLocation && (
         <Modal onClose={() => setShowModal(false)}>
-          <h3 className="text-lg font-semibold mb-3">
-            {selectedLocation.name}의 기념품 목록 ({locationGiftItems.length}개)
-          </h3>
+            <h3 className="text-lg font-semibold mb-3">
+            {selectedLocation.name}의 기념품 관리
+            </h3>
 
-          <ul className="list-disc list-inside text-sm mb-4">
-            {locationGiftItems.map((item, i) => {
-              const base = giftItems.find((g) => g.id === item.gift_item_id);
-              return (
-                <li key={i}>
-                  {base?.name || "[삭제됨]"} - {item.category} - 순서 {item.sort_order} -{" "}
-                  중복허용: {item.allow_multiple ? "O" : "X"}
-                </li>
-              );
-            })}
-          </ul>
+            {/* AdminItems를 장소별로 보여주기 위해 locationId prop 전달 */}
+            <AdminItems locationId={selectedLocation.id} />
 
-          <div className="mt-4">
+            <div className="mt-6">
             <label className="font-semibold">동기화 대상 선택</label>
             <div className="border rounded p-2 max-h-40 overflow-y-auto space-y-1 mt-1">
-              {locations
+                {locations
                 .filter((l) => l.id !== selectedLocation.id)
                 .map((loc) => (
-                  <label key={loc.id} className="flex items-center gap-2">
+                    <label key={loc.id} className="flex items-center gap-2">
                     <input
-                      type="checkbox"
-                      checked={syncTargets.includes(loc.id)}
-                      onChange={() =>
+                        type="checkbox"
+                        checked={syncTargets.includes(loc.id)}
+                        onChange={() =>
                         setSyncTargets((prev) =>
-                          prev.includes(loc.id)
+                            prev.includes(loc.id)
                             ? prev.filter((id) => id !== loc.id)
                             : [...prev, loc.id]
                         )
-                      }
+                        }
                     />
                     {loc.name}
-                  </label>
+                    </label>
                 ))}
             </div>
             <Button onClick={handleSync} className="mt-3">
-              선택한 장소들과 동기화
+                선택한 장소들과 동기화
             </Button>
-          </div>
+            </div>
         </Modal>
-      )}
+    )}
     </div>
   );
 }
