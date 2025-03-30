@@ -53,13 +53,12 @@ export default function BulkItemManager() {
       .delete()
       .in("location_id", syncTargetIds);
 
-    const payload = syncTargetIds.flatMap((targetId) =>
-      sourceItems.map((item) => ({
-        ...item,
-        id: undefined,
-        location_id: targetId,
-      }))
-    );
+      const payload = syncTargetIds.flatMap((targetId) =>
+        sourceItems.map(({ id, ...rest }) => ({
+          ...rest,
+          location_id: targetId,
+        }))
+      );
 
     const { error } = await supabase.from("location_gift_items").insert(payload);
     if (error) return alert("동기화 실패: " + error.message);
