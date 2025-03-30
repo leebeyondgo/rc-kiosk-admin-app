@@ -1,14 +1,7 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { GripVertical } from "lucide-react";
+import { ArrowUp, ArrowDown, Trash2 } from "lucide-react";
 import { createClient } from "@supabase/supabase-js";
-import {
-  DragDropContext,
-  Droppable,
-  Draggable,
-  DropResult,
-} from "react-beautiful-dnd";
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from "@/lib/supabaseConfig";
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -60,10 +53,9 @@ export default function AdminItems({ locationId }: Props) {
     field: keyof LocationGiftItem,
     value: any
   ) => {
-    const updated = locationItems.map((item) =>
-      item.id === id ? { ...item, [field]: value } : item
+    setLocationItems((prev) =>
+      prev.map((item) => (item.id === id ? { ...item, [field]: value } : item))
     );
-    setLocationItems(updated);
 
     const { error } = await supabase
       .from("location_gift_items")
@@ -116,23 +108,25 @@ export default function AdminItems({ locationId }: Props) {
     }
   };
 
-  const handleDragEnd = async (result: DropResult) => {
-    const { source, destination } = result;
-    if (!destination) return;
-
-    const category = result.type as "A" | "B";
-    const sorted = [...locationItems]
-      .filter((i) => i.category === category)
+  const moveItem = async (category: "A" | "B", index: number, direction: "up" | "down") => {
+    const categoryItems = locationItems
+      .filter((item) => item.category === category)
       .sort((a, b) => a.sort_order - b.sort_order);
 
-    const [movedItem] = sorted.splice(source.index, 1);
-    sorted.splice(destination.index, 0, movedItem);
+    const targetIndex = direction === "up" ? index - 1 : index + 1;
+
+    if (targetIndex < 0 || targetIndex >= categoryItems.length) return;
+
+    const updated = [...categoryItems];
+    const temp = updated[index].sort_order;
+    updated[index].sort_order = updated[targetIndex].sort_order;
+    updated[targetIndex].sort_order = temp;
 
     await Promise.all(
-      sorted.map((item, index) =>
+      updated.slice(index, targetIndex + 1).map((item) =>
         supabase
           .from("location_gift_items")
-          .update({ sort_order: index + 1 })
+          .update({ sort_order: item.sort_order })
           .eq("id", item.id)
       )
     );
@@ -146,92 +140,84 @@ export default function AdminItems({ locationId }: Props) {
       .sort((a, b) => a.sort_order - b.sort_order);
 
     return (
-      <Droppable droppableId={category} type={category}>
-        {(provided) => (
-          <div
-            ref={provided.innerRef}
-            {...provided.droppableProps}
-            className="space-y-4"
-          >
-            {filtered.map((item, index) => {
-              const gift = giftItems.find((g) => g.id === item.gift_item_id);
+      <div className="space-y-4">
+        {filtered.map((item, index) => {
+          const gift = giftItems.find((g) => g.id === item.gift_item_id);
 
-              return (
-                <Draggable draggableId={item.id} index={index} key={item.id}>
-                  {(provided) => (
-                    <div
-                      ref={provided.innerRef}
-                      {...provided.draggableProps}
-                      className="p-4 border rounded shadow bg-white relative"
-                    >
-                      <div
-                        {...provided.dragHandleProps}
-                        className="absolute left-2 top-2 text-gray-400 cursor-grab"
-                      >
-                        <GripVertical size={16} />
-                      </div>
+          return (
+            <div
+              key={item.id}
+              className="p-4 border rounded shadow bg-white relative flex flex-col gap-2"
+            >
+              {gift?.image_url && (
+                <img
+                  src={gift.image_url}
+                  alt={gift.name}
+                  className="w-full max-w-xs aspect-[2/1] object-contain rounded"
+                />
+              )}
+              <div className="text-base font-semibold">{gift?.name ?? "알 수 없음"}</div>
 
-                      <div className="ml-6 space-y-2">
-                        {gift?.image_url && (
-                          <img
-                            src={gift.image_url}
-                            alt={gift.name}
-                            className="w-full max-w-xs aspect-[2/1] object-contain rounded"
-                          />
-                        )}
-                        <div className="text-base font-semibold">{gift?.name ?? "알 수 없음"}</div>
+              <div className="text-sm flex gap-4 items-center flex-wrap">
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={item.visible}
+                    onChange={() =>
+                      handleFieldChange(item.id, "visible", !item.visible)
+                    }
+                  />
+                  사용자에게 보임
+                </label>
+                {item.category === "A" && (
+                  <label>
+                    <input
+                      type="checkbox"
+                      checked={item.allow_multiple}
+                      onChange={() =>
+                        handleFieldChange(item.id, "allow_multiple", !item.allow_multiple)
+                      }
+                    />
+                    중복 선택 허용
+                  </label>
+                )}
 
-                        <div className="text-sm flex gap-4">
-                          <label>
-                            <input
-                              type="checkbox"
-                              checked={item.visible}
-                              onChange={() =>
-                                handleFieldChange(item.id, "visible", !item.visible)
-                              }
-                            />
-                            사용자에게 보임
-                          </label>
-                          {item.category === "A" && (
-                            <label>
-                              <input
-                                type="checkbox"
-                                checked={item.allow_multiple}
-                                onChange={() =>
-                                  handleFieldChange(
-                                    item.id,
-                                    "allow_multiple",
-                                    !item.allow_multiple
-                                  )
-                                }
-                              />
-                              중복 선택 허용
-                            </label>
-                          )}
-                          <Button
-                            variant="ghost"
-                            className="text-red-500 ml-auto"
-                            onClick={() => handleDelete(item.id)}
-                          >
-                            삭제
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </Draggable>
-              );
-            })}
-            {provided.placeholder}
-          </div>
-        )}
-      </Droppable>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  onClick={() => moveItem(category, index, "up")}
+                  disabled={index === 0}
+                >
+                  <ArrowUp size={16} />
+                </Button>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  onClick={() => moveItem(category, index, "down")}
+                  disabled={index === filtered.length - 1}
+                >
+                  <ArrowDown size={16} />
+                </Button>
+
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="text-red-500 ml-auto"
+                  onClick={() => handleDelete(item.id)}
+                >
+                  <Trash2 size={16} />
+                </Button>
+              </div>
+            </div>
+          );
+        })}
+      </div>
     );
   };
 
   return (
     <div>
-      {/* 추가 폼 */} {/* ✅ 복구된 추가 영역 */}
+      {/* 추가 폼 */}
       <div className="border p-4 rounded mb-6 space-y-3 bg-gray-50">
         <h3 className="font-semibold text-lg">기념품 추가</h3>
         <select
@@ -257,19 +243,17 @@ export default function AdminItems({ locationId }: Props) {
         <Button onClick={handleAddItem}>추가</Button>
       </div>
 
-      {/* 드래그 리스트 */}
-      <DragDropContext onDragEnd={handleDragEnd}>
-        <div className="space-y-8 mt-4">
-          <div>
-            <h2 className="text-lg font-semibold mb-2">A 품목</h2>
-            {renderCategory("A")}
-          </div>
-          <div>
-            <h2 className="text-lg font-semibold mb-2">B 품목</h2>
-            {renderCategory("B")}
-          </div>
+      {/* 항목 목록 */}
+      <div className="space-y-8 mt-4">
+        <div>
+          <h2 className="text-lg font-semibold mb-2">A 품목</h2>
+          {renderCategory("A")}
         </div>
-      </DragDropContext>
+        <div>
+          <h2 className="text-lg font-semibold mb-2">B 품목</h2>
+          {renderCategory("B")}
+        </div>
+      </div>
     </div>
   );
 }
