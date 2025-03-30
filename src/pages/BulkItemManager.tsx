@@ -26,10 +26,30 @@ export default function BulkItemManager() {
   const [syncSourceId, setSyncSourceId] = useState<string>("");
   const [syncTargetIds, setSyncTargetIds] = useState<string[]>([]);
 
+  // 기념품 목록을 location_id 기준으로 저장
+  const [locationItemMap, setLocationItemMap] = useState<Record<string, string[]>>({});
+
   useEffect(() => {
     const fetchData = async () => {
-      const { data } = await supabase.from("donation_locations").select("*");
-      if (data) setLocations(data);
+      const { data: locs } = await supabase.from("donation_locations").select("*");
+      const { data: items } = await supabase
+        .from("location_gift_items")
+        .select("location_id, gift_items(name)")
+        .order("sort_order");
+
+      if (locs) setLocations(locs);
+
+      // 기념품 이름들을 location_id 기준으로 묶기
+      const grouped: Record<string, string[]> = {};
+      if (items) {
+        for (const item of items) {
+          const locId = item.location_id;
+          const name = (item as any).gift_items?.name;
+          if (!name) continue;
+          grouped[locId] = grouped[locId] ? [...grouped[locId], name] : [name];
+        }
+      }
+      setLocationItemMap(grouped);
     };
     fetchData();
   }, []);
@@ -53,12 +73,12 @@ export default function BulkItemManager() {
       .delete()
       .in("location_id", syncTargetIds);
 
-      const payload = syncTargetIds.flatMap((targetId) =>
-        sourceItems.map(({ id, ...rest }) => ({
-          ...rest,
-          location_id: targetId,
-        }))
-      );
+    const payload = syncTargetIds.flatMap((targetId) =>
+      sourceItems.map(({ id, ...rest }) => ({
+        ...rest,
+        location_id: targetId,
+      }))
+    );
 
     const { error } = await supabase.from("location_gift_items").insert(payload);
     if (error) return alert("동기화 실패: " + error.message);
@@ -146,6 +166,11 @@ export default function BulkItemManager() {
               {locations.map((loc) => (
                 <div key={loc.id} className="border rounded p-4 shadow flex flex-col gap-2">
                   <h4 className="font-semibold text-lg">{loc.name}</h4>
+                  <div className="text-sm text-gray-500">
+                    {(locationItemMap[loc.id]?.slice(0, 3) || []).join(", ")}
+                    {locationItemMap[loc.id]?.length > 3 &&
+                      ` 외 ${locationItemMap[loc.id].length - 3}개`}
+                  </div>
                   <Button onClick={() => handleLocationClick(loc)}>관리</Button>
                 </div>
               ))}
