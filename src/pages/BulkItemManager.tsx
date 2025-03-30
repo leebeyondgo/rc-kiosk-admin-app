@@ -52,43 +52,14 @@ export default function BulkItemManager() {
           </ul>
         </div>
       </div>
-        {showModal && selectedLocation && (
+      {showModal && selectedLocation && (
         <Modal onClose={() => setShowModal(false)}>
             <h3 className="text-lg font-semibold mb-3">
             {selectedLocation.name}의 기념품 관리
             </h3>
-
-            {/* AdminItems를 장소별로 보여주기 위해 locationId prop 전달 */}
             <AdminItems locationId={selectedLocation.id} />
-
-            <div className="mt-6">
-            <label className="font-semibold">동기화 대상 선택</label>
-            <div className="border rounded p-2 max-h-40 overflow-y-auto space-y-1 mt-1">
-                {locations
-                .filter((l) => l.id !== selectedLocation.id)
-                .map((loc) => (
-                    <label key={loc.id} className="flex items-center gap-2">
-                    <input
-                        type="checkbox"
-                        checked={syncTargets.includes(loc.id)}
-                        onChange={() =>
-                        setSyncTargets((prev) =>
-                            prev.includes(loc.id)
-                            ? prev.filter((id) => id !== loc.id)
-                            : [...prev, loc.id]
-                        )
-                        }
-                    />
-                    {loc.name}
-                    </label>
-                ))}
-            </div>
-            <Button onClick={handleSync} className="mt-3">
-                선택한 장소들과 동기화
-            </Button>
-            </div>
         </Modal>
-    )}
+        )}
     </div>
   );
 }
