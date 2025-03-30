@@ -67,14 +67,21 @@ export default function AdminRecords() {
     const filtered = records.filter((r) => {
       const matchesLocation =
         selectedLocations.length === 0 || selectedLocations.includes(r.location_id);
-      const recordDate = new Date(r.timestamp || "");
-      const from = new Date(startDate);
-      const to = new Date(endDate);
-      to.setHours(23, 59, 59, 999);
-      return matchesLocation && recordDate >= from && recordDate <= to;
+  
+      if (!r.timestamp) return false;
+  
+      const recordDate = new Date(r.timestamp);
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+      start.setHours(0, 0, 0, 0);
+      end.setHours(23, 59, 59, 999);
+  
+      return matchesLocation && recordDate >= start && recordDate <= end;
     });
+  
     setFilteredRecords(filtered);
   }, [records, selectedLocations, startDate, endDate]);
+  
 
   const handleDelete = async (id: string) => {
     if (confirm("정말 삭제하시겠습니까?")) {
