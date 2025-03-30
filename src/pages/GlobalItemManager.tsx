@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
-import ImageSelectorModal from "@/components/ui/ImageSelectorModal"; // 이미지 선택 모달
+import ImageSelectorModal from "@/modals/ImageSelectorModal"; // 이미지 선택 모달
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 

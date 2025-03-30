@@ -11,7 +11,7 @@ import {
   Boxes
 } from "lucide-react";
 import AdminRecords from "./AdminRecords";
-import AdminItems from "./AdminItems";
+import AdminItems from "../modals/AdminItems";
 import AdminLogin from "./AdminLogin";
 import BulkItemManager from "./BulkItemManager";
 import KioskLinks from "./KioskLinks";

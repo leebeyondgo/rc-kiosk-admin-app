@@ -3,7 +3,7 @@ import { createClient } from "@supabase/supabase-js";
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from "@/lib/supabaseConfig";
 import { Button } from "@/components/ui/button";
 import Modal from "@/components/ui/Modal";
-import AdminItems from "@/pages/AdminItems";
+import AdminItems from "@/modals/AdminItems";
 import GlobalItemManager from "@/pages/GlobalItemManager"; // 👈 새로 만들 페이지
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
