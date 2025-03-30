@@ -12,6 +12,7 @@ import {
 import AdminRecords from "./AdminRecords";
 import AdminItems from "./AdminItems";
 import AdminLogin from "./AdminLogin";
+import BulkItemManager from "./BulkItemManager";
 import { createClient } from "@supabase/supabase-js";
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from "@/lib/supabaseConfig";
 
@@ -47,6 +48,8 @@ export default function MainLayout() {
         return "상품 관리";
       case "login":
         return "";
+      case "bulkItems":
+        return <BulkItemManager />;
       default:
         return "기념품 선택";
     }
@@ -129,6 +132,13 @@ export default function MainLayout() {
                   onClick={() => setActiveTab("items")}
                 >
                   <PackageOpen className="mr-2 h-4 w-4" />상품 관리
+                </Button>
+                <Button
+                  variant={activeTab === "bulkItems" ? "default" : "outline"}
+                  className="w-full justify-start"
+                  onClick={() => setActiveTab("bulkItems")}
+                >
+                  <PackageOpen className="mr-2 h-4 w-4" />기념품 일괄 관리
                 </Button>
               </>
             )}
