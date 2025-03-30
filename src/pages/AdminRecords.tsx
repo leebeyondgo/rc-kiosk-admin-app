@@ -6,7 +6,6 @@ import { createClient } from "@supabase/supabase-js";
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from "@/lib/supabaseConfig";
 import Datepicker from "react-tailwindcss-datepicker";
 
-
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 interface GiftRecord {
@@ -136,7 +135,7 @@ export default function AdminRecords() {
           <label className="block font-semibold mb-1">날짜 선택</label>
           <Datepicker
             value={dateRange}
-            onChange={(newValue) => setDateRange(newValue)}
+            onChange={(value) => setDateRange(value)}
             showShortcuts={true}
             primaryColor="red"
             displayFormat="YYYY-MM-DD"
