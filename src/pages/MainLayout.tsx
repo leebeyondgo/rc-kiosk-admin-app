@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
@@ -7,8 +7,7 @@ import {
   Gift,
   LogIn,
   LogOut,
-  Menu,
-  ChevronDown
+  Menu
 } from "lucide-react";
 import AdminRecords from "./AdminRecords";
 import AdminItems from "./AdminItems";
@@ -26,49 +25,13 @@ export default function MainLayout() {
     "selector" | "records" | "items" | "login"
   >(() => localStorage.getItem("activeTab") as any || "selector");
 
-  const [centers, setCenters] = useState<{ id: string; name: string }[]>([]);
-  const [selectedCenter, setSelectedCenter] = useState<string>(() =>
-    localStorage.getItem("selectedCenter") || ""
-  );
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-
-  const dropdownRef = useRef<HTMLDivElement>(null);
-
-  const selectedCenterName = centers.find(c => c.id === selectedCenter)?.name || "";
-
   useEffect(() => {
     setIsAdmin(sessionStorage.getItem("isAdmin") === "true");
   }, []);
 
   useEffect(() => {
-    const fetchCenters = async () => {
-      const { data, error } = await supabase.from("donation_centers").select("id, name");
-      if (!error && data) {
-        setCenters(data);
-      }
-    };
-    fetchCenters();
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem("selectedCenter", selectedCenter);
-  }, [selectedCenter]);
-
-  useEffect(() => {
     localStorage.setItem("activeTab", activeTab);
   }, [activeTab]);
-
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
-        setDropdownOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
 
   const handleLogout = () => {
     sessionStorage.removeItem("isAdmin");
@@ -194,41 +157,6 @@ export default function MainLayout() {
 
       <div className="flex-1 overflow-auto p-4 w-full">
         <h1 className="text-2xl font-bold text-center mb-2">{renderTitle()}</h1>
-
-        {activeTab === "selector" && (
-          <div className="flex justify-center mb-6">
-            <div className="relative inline-block text-left" ref={dropdownRef}>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setDropdownOpen(!dropdownOpen);
-                }}
-                className="text-base px-2 py-1 bg-transparent flex items-center gap-1"
-              >
-                {selectedCenterName || "헌혈 장소 선택"}
-                <ChevronDown className="w-4 h-4 text-gray-500" />
-              </button>
-              {dropdownOpen && (
-                <div className="absolute left-0 mt-2 w-48 bg-white border rounded shadow z-50">
-                  {centers.map((center) => (
-                    <button
-                      key={center.id}
-                      className="block w-full text-left px-4 py-2 hover:bg-gray-100"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setSelectedCenter(center.id);
-                        setDropdownOpen(false);
-                      }}
-                    >
-                      {center.name}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
         {renderContent()}
       </div>
     </div>
