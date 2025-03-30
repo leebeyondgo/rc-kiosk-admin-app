@@ -124,21 +124,34 @@ export default function AdminRecords() {
     );
   };
 
+  const [dateRange, setDateRange] = useState<{ startDate: string | null; endDate: string | null }>({
+    startDate: new Date().toISOString().split("T")[0],
+    endDate: new Date().toISOString().split("T")[0],
+  });
+
   return (
     <div className="max-w-3xl mx-auto p-4 space-y-8">
       {/* 필터 섹션 */}
       <div className="flex flex-col gap-4">
         <div>
           <label className="block font-semibold mb-1">날짜 선택</label>
-          {/* 잠시 주석처리하여 문제 확인 */}
-          {/* <Datepicker
+          <Datepicker
             value={dateRange}
-            onChange={(value) => setDateRange(value)}
+            onChange={(value) => {
+              if (value && value.startDate && value.endDate) {
+                setDateRange({
+                  startDate: value.startDate,
+                  endDate: value.endDate,
+                });
+              } else {
+                setDateRange({ startDate: null, endDate: null });
+              }
+            }}
             showShortcuts
             primaryColor="red"
             displayFormat="YYYY-MM-DD"
             separator=" ~ "
-          /> */}
+          />
         </div>
 
         <div>
