@@ -32,7 +32,7 @@ export default function BulkItemManager() {
 
   const fetchItems = async (locationId: string) => {
     const { data } = await supabase
-      .from("items")
+      .from("gift_items")
       .select("*")
       .eq("location_id", locationId);
     setItems(data || []);
@@ -49,9 +49,9 @@ export default function BulkItemManager() {
     const sourceItems = items.map((item) => ({ name: item.name }));
 
     for (const targetId of syncTargets) {
-      await supabase.from("items").delete().eq("location_id", targetId);
+      await supabase.from("gift_items").delete().eq("location_id", targetId);
       for (const item of sourceItems) {
-        await supabase.from("items").insert({ ...item, location_id: targetId });
+        await supabase.from("gift_items").insert({ ...item, location_id: targetId });
       }
     }
     alert("동기화 완료");
