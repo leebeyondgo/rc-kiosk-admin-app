@@ -88,7 +88,7 @@ export default function MainLayout() {
           e.stopPropagation();
           setSidebarOpen(!sidebarOpen);
         }}
-        className="fixed top-4 left-4 z-50 p-2 bg-white rounded-full shadow-md"
+        className="fixed top-4 left-4 z-40 p-2 bg-white rounded-full shadow-md"
       >
         <Menu />
       </button>
@@ -96,7 +96,7 @@ export default function MainLayout() {
       {/* 사이드 메뉴 */}
       <div
         className={`
-          fixed top-0 left-0 h-full bg-white shadow-lg z-100 transform 
+          fixed top-0 left-0 h-full bg-white shadow-lg z-50 transform 
           transition-transform duration-300 w-64 p-4 flex flex-col justify-between
           ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
         `}
