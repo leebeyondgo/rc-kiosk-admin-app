@@ -49,7 +49,7 @@ export default function KioskLinks() {
             <QRCode
               id={`qr-${loc.id}`}
               value={getKioskUrl(loc.id)}
-              size={150}
+              size={512}
               includeMargin={true}
             />
 
