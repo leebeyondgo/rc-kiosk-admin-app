@@ -52,7 +52,6 @@ export default function AdminRecords() {
   
     fetchData();
   
-    // Realtime subscription
     const subscription = supabase
       .channel("gift_records_changes")
       .on(
