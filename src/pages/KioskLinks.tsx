@@ -49,9 +49,17 @@ export default function KioskLinks() {
             <QRCode
               id={`qr-${loc.id}`}
               value={getKioskUrl(loc.id)}
-              size={512}
+              size={150}
               includeMargin={true}
             />
+            <div className="hidden">
+              <QRCode
+                id={`qr-download-${loc.id}`}
+                value={getKioskUrl(loc.id)}
+                size={512}  // 고해상도 설정 (1024px 권장)
+                includeMargin={true}
+              />
+            </div>
 
             <div className="mt-3 space-y-2 w-full">
               <Button
