@@ -88,7 +88,7 @@ export default function MainLayout() {
           e.stopPropagation();
           setSidebarOpen(!sidebarOpen);
         }}
-        className="fixed top-4 left-4 z-0 p-2 bg-white rounded-full shadow-md"
+        className="fixed top-4 left-4 z-50 p-2 bg-white rounded-full shadow-md"
       >
         <Menu />
       </button>
