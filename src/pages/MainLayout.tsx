@@ -28,7 +28,7 @@ export default function MainLayout() {
   >(() => localStorage.getItem("activeTab") as any || "selector");
 
   useEffect(() => {
-    setIsAdmin(sessionStorage.getItem("isAdmin") === "true");
+    setIsAdmin(localStorage.getItem("isAdmin") === "true");
   }, []);
 
   useEffect(() => {
@@ -36,7 +36,7 @@ export default function MainLayout() {
   }, [activeTab]);
 
   const handleLogout = () => {
-    sessionStorage.removeItem("isAdmin");
+    localStorage.removeItem("isAdmin");
     setIsAdmin(false);
     setActiveTab("selector");
   };
