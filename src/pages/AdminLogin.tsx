@@ -17,7 +17,7 @@ export default function AdminLogin({ onBack, onLoginSuccess }: AdminLoginProps) 
 
   const handleLogin = async () => {
     const { data, error } = await supabase
-      .from("center_auth")
+      .from("user_auth")
       .select("password")
       .eq("id", username)
       .single();
