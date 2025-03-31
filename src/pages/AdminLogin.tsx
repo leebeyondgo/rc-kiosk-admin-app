@@ -29,7 +29,7 @@ export default function AdminLogin({ onBack, onLoginSuccess }: AdminLoginProps) 
     }
 
     if (data && data.password === password) {
-      sessionStorage.setItem("isAdmin", "true");
+      localStorage.setItem("isAdmin", "true");
       onLoginSuccess();
     } else {
       alert("아이디 또는 비밀번호가 틀렸습니다.");
