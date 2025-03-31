@@ -37,7 +37,7 @@ export default function AdminRecords() {
     const fetchData = async () => {
       const { data: recordsData } = await supabase.from("gift_records").select("*");
       const { data: locationData } = await supabase.from("donation_locations").select("*");
-
+  
       if (recordsData) {
         const sorted = (recordsData as GiftRecord[]).sort(
           (a, b) => new Date(b.timestamp || "").getTime() - new Date(a.timestamp || "").getTime()
@@ -46,12 +46,29 @@ export default function AdminRecords() {
       } else {
         setRecords([]);
       }
-
+  
       setLocations(locationData ?? []);
     };
-
+  
     fetchData();
+  
+    // Realtime subscription
+    const subscription = supabase
+      .channel("gift_records_changes")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "gift_records" },
+        () => {
+          fetchData();
+        }
+      )
+      .subscribe();
+  
+    return () => {
+      supabase.removeChannel(subscription);
+    };
   }, []);
+  
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
