@@ -97,7 +97,6 @@ export default function AdminRecords() {
 
     setFilteredRecords(filtered);
 
-    // 선택된 항목에서 필터링된 것만 유지
     setSelectedRecords((prev) => {
       const filteredIds = new Set(filtered.map((r) => r.id));
       return new Set([...prev].filter((id) => filteredIds.has(id)));
