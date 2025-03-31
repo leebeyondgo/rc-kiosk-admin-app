@@ -27,7 +27,7 @@ export default function KioskLinks() {
     `https://leebeyondgo.github.io/rc-kiosk-app/#/location/${locationId}`;
 
   const handleQRDownload = (locationId: string) => {
-    const canvas = document.getElementById(`qr-${locationId}`) as HTMLCanvasElement;
+    const canvas = document.getElementById(`qr-download-${locationId}`) as HTMLCanvasElement;
     const pngUrl = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
 
     const downloadLink = document.createElement("a");
@@ -46,17 +46,20 @@ export default function KioskLinks() {
           >
             <h3 className="font-semibold text-center mb-2">{loc.name}</h3>
 
+            {/* 화면용 (적당한 크기) */}
             <QRCode
               id={`qr-${loc.id}`}
               value={getKioskUrl(loc.id)}
               size={150}
               includeMargin={true}
             />
+
+            {/* 다운로드용 고해상도 QR코드 (숨김 처리) */}
             <div className="hidden">
               <QRCode
                 id={`qr-download-${loc.id}`}
                 value={getKioskUrl(loc.id)}
-                size={512}  // 고해상도 설정 (1024px 권장)
+                size={1024}  // 고해상도 설정 (1024px 권장)
                 includeMargin={true}
               />
             </div>
