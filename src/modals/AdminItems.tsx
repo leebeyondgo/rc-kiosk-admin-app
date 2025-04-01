@@ -149,8 +149,11 @@ export default function AdminItems({ locationId }: Props) {
 
           return (
             <div
+            <div
               key={item.id}
-              className="relative p-4 border rounded shadow bg-white flex flex-col gap-2"
+              className={`relative p-4 border rounded shadow flex flex-col gap-2 transition
+                ${item.visible ? "bg-white" : "bg-gray-100 opacity-50"}
+              `}
             >
               {/* 정렬 버튼 상단 우측 배치 */}
               <div className="absolute top-3 right-3 flex gap-2">
