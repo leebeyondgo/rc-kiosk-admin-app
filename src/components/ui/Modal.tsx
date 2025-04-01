@@ -1,4 +1,3 @@
-// components/ui/Modal.tsx
 import { useEffect } from "react";
 
 interface Props {
@@ -22,9 +21,9 @@ export default function Modal({ children, onClose }: Props) {
         className="bg-white max-h-[90vh] overflow-y-auto rounded-lg w-full max-w-3xl p-6 shadow-lg relative"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* 닫기 버튼 (선택 사항) */}
+        {/* 닫기 버튼 (더 큼직하고 명확하게) */}
         <button
-          className="absolute top-3 right-3 text-gray-500 hover:text-black"
+          className="absolute top-3 right-3 text-gray-500 hover:text-black text-2xl font-bold w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-200 transition"
           onClick={onClose}
         >
           ✕
