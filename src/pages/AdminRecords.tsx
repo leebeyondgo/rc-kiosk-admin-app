@@ -28,6 +28,7 @@ export default function AdminRecords() {
   const [selectedLocations, setSelectedLocations] = useState<string[]>([]);
   const [selectedRecords, setSelectedRecords] = useState<Set<string>>(new Set());
   const [acknowledgedRecords, setAcknowledgedRecords] = useState<Set<string>>(new Set());
+  const [highlightedRecords, setHighlightedRecords] = useState<Set<string>>(new Set());
   const [startDate, setStartDate] = useState<Date>(new Date());
   const [endDate, setEndDate] = useState<Date>(new Date());
   const [dateMode, setDateMode] = useState<'today' | 'range'>('today');
@@ -57,9 +58,22 @@ export default function AdminRecords() {
       .channel("gift_records_changes")
       .on(
         "postgres_changes",
-        { event: "*", schema: "public", table: "gift_records" },
-        () => {
-          fetchData();
+        { event: "INSERT", schema: "public", table: "gift_records" },
+        (payload) => {
+          const newRecord = payload.new as GiftRecord;
+          setRecords((prev) => {
+            const updated = [newRecord, ...prev.filter((r) => r.id !== newRecord.id)];
+            return updated.sort((a, b) => new Date(b.timestamp || "").getTime() - new Date(a.timestamp || "").getTime());
+          });
+          setHighlightedRecords((prev) => new Set(prev).add(newRecord.id));
+
+          setTimeout(() => {
+            setHighlightedRecords((prev) => {
+              const updated = new Set(prev);
+              updated.delete(newRecord.id);
+              return updated;
+            });
+          }, 3000); // 3초간 강조 표시
         }
       )
       .subscribe();
@@ -285,12 +299,17 @@ export default function AdminRecords() {
             }
 
             const isAcknowledged = acknowledgedRecords.has(record.id);
+            const isHighlighted = highlightedRecords.has(record.id);
 
             return (
               <div
                 key={record.id}
-                className={`relative border rounded-lg p-4 shadow-sm cursor-pointer transition ${
-                  isAcknowledged ? "bg-gray-100 opacity-70" : "bg-white hover:bg-gray-50"
+                className={`relative border rounded-lg p-4 shadow-sm cursor-pointer transition duration-500 ${
+                  isAcknowledged
+                    ? "bg-gray-100 opacity-70"
+                    : isHighlighted
+                    ? "bg-yellow-100 animate-pulse"
+                    : "bg-white hover:bg-gray-50"
                 }`}
                 onClick={() => toggleAcknowledge(record.id)}
               >
