@@ -149,7 +149,6 @@ export default function AdminItems({ locationId }: Props) {
 
           return (
             <div
-            <div
               key={item.id}
               className={`relative p-4 border rounded shadow flex flex-col gap-2 transition
                 ${item.visible ? "bg-white" : "bg-gray-100 opacity-50"}
