@@ -308,7 +308,7 @@ export default function AdminRecords() {
                   isAcknowledged
                     ? "bg-gray-100 opacity-70"
                     : isHighlighted
-                    ? "bg-yellow-100 animate-pulse"
+                    ? "animate-highlight"
                     : "bg-white hover:bg-gray-50"
                 }`}
                 onClick={() => toggleAcknowledge(record.id)}
