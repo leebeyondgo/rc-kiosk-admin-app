@@ -8,9 +8,9 @@
     "preview": "vite preview",
     "deploy": "gh-pages -d dist"
   },
-  "dependencies": 
-  {
+  "dependencies": {
     "@supabase/supabase-js": "^2.39.5",
+    "@headlessui/react": "^1.7.17",
     "clsx": "^1.2.1",
     "lucide-react": "^0.308.0",
     "qrcode.react": "^3.1.0",
