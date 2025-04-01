@@ -5,16 +5,10 @@ import { createClient } from "@supabase/supabase-js";
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from "@/lib/supabaseConfig";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import StatisticsModal from "@/modals/StatisticsModal"; // 상단에 import
+import { GiftRecord } from "@/types"; // 타입 import
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-interface GiftRecord {
-  id: string;
-  name: string;
-  items: string[];
-  timestamp?: string;
-  location_id: string;
-}
 
 interface Location {
   id: string;
@@ -34,6 +28,7 @@ export default function AdminRecords() {
   const [dateMode, setDateMode] = useState<'today' | 'range'>('today');
   const [showLocationDropdown, setShowLocationDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
+  const [isStatsOpen, setIsStatsOpen] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -269,6 +264,10 @@ export default function AdminRecords() {
           </Button>
         </div>
 
+        <Button onClick={() => setIsStatsOpen(true)} variant="default">
+          통계 보기
+        </Button>
+
         {/* 선택 및 항목 수 */}
         <div className="flex justify-between items-center text-sm text-gray-500">
           <label className="flex items-center gap-2">
@@ -363,6 +362,11 @@ export default function AdminRecords() {
           })}
         </div>
       )}
+      <StatisticsModal
+        isOpen={isStatsOpen}
+        onClose={() => setIsStatsOpen(false)}
+        data={filteredRecords}
+      />
     </div>
   );
 }
