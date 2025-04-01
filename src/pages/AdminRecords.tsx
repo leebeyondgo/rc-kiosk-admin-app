@@ -276,11 +276,6 @@ export default function AdminRecords() {
               items = [];
             }
 
-            const itemCounts: { [key: string]: number } = {};
-            items.forEach((item) => {
-              itemCounts[item] = (itemCounts[item] || 0) + 1;
-            });
-
             return (
               <div key={record.id} className="relative border rounded-lg p-4 bg-white shadow-sm">
                 <div className="absolute top-3 left-3">
@@ -313,13 +308,12 @@ export default function AdminRecords() {
                 </div>
 
                 <div className="grid grid-cols-2 gap-2 mt-2">
-                  {Object.entries(itemCounts).map(([item, count], i) => (
+                  {items.map((item, i) => (
                     <div
                       key={i}
                       className="flex justify-between items-center px-3 py-2 bg-gray-50 border rounded text-sm text-gray-700 shadow-inner"
                     >
                       <span>{item}</span>
-                      {count > 1 && <span className="text-gray-500 text-xs">x{count}</span>}
                     </div>
                   ))}
                 </div>
