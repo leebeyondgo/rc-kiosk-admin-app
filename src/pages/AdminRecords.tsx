@@ -265,57 +265,68 @@ export default function AdminRecords() {
       {filteredRecords.length === 0 ? (
         <p className="text-gray-500 text-center">기록이 없습니다.</p>
       ) : (
-        filteredRecords.map((record) => {
-          const locationName = locations.find((loc) => loc.id === record.location_id)?.name || "-";
+        <div className="space-y-4">
+          {filteredRecords.map((record) => {
+            const locationName = locations.find((loc) => loc.id === record.location_id)?.name || "-";
 
-          let items: string[] = [];
-          try {
-            items = Array.isArray(record.items) ? record.items : JSON.parse(record.items as any);
-          } catch {
-            items = [];
-          }
+            let items: string[] = [];
+            try {
+              items = Array.isArray(record.items) ? record.items : JSON.parse(record.items as any);
+            } catch {
+              items = [];
+            }
 
-          return (
-            <div key={record.id} className="relative border rounded-lg p-4 bg-white shadow-sm">
-              <div className="absolute top-3 left-3">
-                <input
-                  type="checkbox"
-                  checked={selectedRecords.has(record.id)}
-                  onChange={() => toggleRecordSelection(record.id)}
-                />
+            const itemCounts: { [key: string]: number } = {};
+            items.forEach((item) => {
+              itemCounts[item] = (itemCounts[item] || 0) + 1;
+            });
+
+            return (
+              <div key={record.id} className="relative border rounded-lg p-4 bg-white shadow-sm">
+                <div className="absolute top-3 left-3">
+                  <input
+                    type="checkbox"
+                    checked={selectedRecords.has(record.id)}
+                    onChange={() => toggleRecordSelection(record.id)}
+                  />
+                </div>
+
+                <button
+                  onClick={() => handleDelete(record.id)}
+                  className="absolute top-3 right-3 text-gray-400 hover:text-red-500"
+                >
+                  <Trash2 size={16} />
+                </button>
+
+                <div className="ml-6 mb-1 flex flex-wrap items-center gap-2">
+                  <span className="font-semibold text-gray-800">{record.name}</span>
+                  <span className="text-xs text-gray-500">
+                    {new Date(record.timestamp || "").toLocaleString("ko-KR", {
+                      year: "2-digit",
+                      month: "2-digit",
+                      day: "2-digit",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </span>
+                  <span className="text-xs text-gray-400">({locationName})</span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2 mt-2">
+                  {Object.entries(itemCounts).map(([item, count], i) => (
+                    <div
+                      key={i}
+                      className="flex justify-between items-center px-3 py-2 bg-gray-50 border rounded text-sm text-gray-700 shadow-inner"
+                    >
+                      <span>{item}</span>
+                      {count > 1 && <span className="text-gray-500 text-xs">x{count}</span>}
+                    </div>
+                  ))}
+                </div>
               </div>
-
-              <button
-                onClick={() => handleDelete(record.id)}
-                className="absolute top-3 right-3 text-gray-400 hover:text-red-500"
-              >
-                <Trash2 size={16} />
-              </button>
-
-              <div className="ml-6 mb-1 flex flex-wrap items-center gap-2">
-                <span className="font-semibold text-gray-800">{record.name}</span>
-                <span className="text-xs text-gray-500">
-                  {new Date(record.timestamp || "").toLocaleString("ko-KR", {
-                    year: "2-digit",
-                    month: "2-digit",
-                    day: "2-digit",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                </span>
-                <span className="text-xs text-gray-400">({locationName})</span>
-              </div>
-
-              <ul className="ml-6 list-disc list-inside text-sm text-gray-700 mt-1">
-                {items.length > 0 ? (
-                  items.map((item, i) => <li key={i}>{item}</li>)
-                ) : (
-                  <li className="text-gray-400">선택된 기념품 없음</li>
-                )}
-              </ul>
-            </div>
-          );
-        })
+            );
+          })}
+        </div>
       )}
     </div>
   );
