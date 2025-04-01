@@ -27,6 +27,7 @@ export default function AdminRecords() {
   const [locations, setLocations] = useState<Location[]>([]);
   const [selectedLocations, setSelectedLocations] = useState<string[]>([]);
   const [selectedRecords, setSelectedRecords] = useState<Set<string>>(new Set());
+  const [acknowledgedRecords, setAcknowledgedRecords] = useState<Set<string>>(new Set());
   const [startDate, setStartDate] = useState<Date>(new Date());
   const [endDate, setEndDate] = useState<Date>(new Date());
   const [dateMode, setDateMode] = useState<'today' | 'range'>('today');
@@ -37,7 +38,7 @@ export default function AdminRecords() {
     const fetchData = async () => {
       const { data: recordsData } = await supabase.from("gift_records").select("*");
       const { data: locationData } = await supabase.from("donation_locations").select("*");
-  
+
       if (recordsData) {
         const sorted = (recordsData as GiftRecord[]).sort(
           (a, b) => new Date(b.timestamp || "").getTime() - new Date(a.timestamp || "").getTime()
@@ -46,12 +47,12 @@ export default function AdminRecords() {
       } else {
         setRecords([]);
       }
-  
+
       setLocations(locationData ?? []);
     };
-  
+
     fetchData();
-  
+
     const subscription = supabase
       .channel("gift_records_changes")
       .on(
@@ -62,12 +63,11 @@ export default function AdminRecords() {
         }
       )
       .subscribe();
-  
+
     return () => {
       supabase.removeChannel(subscription);
     };
   }, []);
-  
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -132,6 +132,14 @@ export default function AdminRecords() {
 
   const toggleRecordSelection = (id: string) => {
     setSelectedRecords((prev) => {
+      const newSet = new Set(prev);
+      newSet.has(id) ? newSet.delete(id) : newSet.add(id);
+      return newSet;
+    });
+  };
+
+  const toggleAcknowledge = (id: string) => {
+    setAcknowledgedRecords((prev) => {
       const newSet = new Set(prev);
       newSet.has(id) ? newSet.delete(id) : newSet.add(id);
       return newSet;
@@ -276,18 +284,32 @@ export default function AdminRecords() {
               items = [];
             }
 
+            const isAcknowledged = acknowledgedRecords.has(record.id);
+
             return (
-              <div key={record.id} className="relative border rounded-lg p-4 bg-white shadow-sm">
+              <div
+                key={record.id}
+                className={`relative border rounded-lg p-4 shadow-sm cursor-pointer transition ${
+                  isAcknowledged ? "bg-gray-100 opacity-70" : "bg-white hover:bg-gray-50"
+                }`}
+                onClick={() => toggleAcknowledge(record.id)}
+              >
                 <div className="absolute top-3 left-3">
                   <input
                     type="checkbox"
                     checked={selectedRecords.has(record.id)}
-                    onChange={() => toggleRecordSelection(record.id)}
+                    onChange={(e) => {
+                      e.stopPropagation();
+                      toggleRecordSelection(record.id);
+                    }}
                   />
                 </div>
 
                 <button
-                  onClick={() => handleDelete(record.id)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDelete(record.id);
+                  }}
                   className="absolute top-3 right-3 text-gray-400 hover:text-red-500"
                 >
                   <Trash2 size={16} />
