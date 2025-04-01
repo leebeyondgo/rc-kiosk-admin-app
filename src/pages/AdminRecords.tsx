@@ -204,7 +204,7 @@ export default function AdminRecords() {
         <div className="space-y-2" ref={dropdownRef}>
           <label className="font-semibold">헌혈 장소</label>
           <div className="relative">
-            <Button onClick={() => setShowLocationDropdown(!showLocationDropdown)} variant="outline">
+            <Button onClick={() => setShowLocationDropdown(!showLocationDropdown)} variant="soft">
               {selectedLocations.length > 0
                 ? `${selectedLocations.length}개 선택됨`
                 : "장소 선택"}
@@ -246,7 +246,7 @@ export default function AdminRecords() {
               setStartDate(today);
               setEndDate(today);
             }}
-            variant="outline"
+            variant="soft"
           >
             필터 초기화
           </Button>
