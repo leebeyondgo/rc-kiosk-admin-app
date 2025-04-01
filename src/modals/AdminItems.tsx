@@ -176,7 +176,7 @@ export default function AdminItems({ locationId }: Props) {
                 <img
                   src={gift.image_url}
                   alt={gift.name}
-                  className="w-full max-w-xs aspect-[2/1] object-contain rounded"
+                  className="w-32 h-20 object-contain rounded self-start"
                 />
               )}
               <div className="text-base font-semibold">{gift?.name ?? "알 수 없음"}</div>
