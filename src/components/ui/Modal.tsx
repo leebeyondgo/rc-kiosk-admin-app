@@ -1,4 +1,3 @@
-// src/components/ui/Modal.tsx
 import { useEffect } from "react";
 import { createPortal } from "react-dom";
 
@@ -8,7 +7,6 @@ interface Props {
 }
 
 export default function Modal({ children, onClose }: Props) {
-  // 스크롤 막기
   useEffect(() => {
     const originalOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
@@ -19,12 +17,12 @@ export default function Modal({ children, onClose }: Props) {
 
   return createPortal(
     <div
-      className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4 h-screen overflow-y-auto"
+      className="fixed inset-0 z-50 bg-black bg-opacity-50 flex justify-center overflow-y-auto"
       onClick={onClose}
     >
       <div
-        className="w-full max-w-3xl rounded-lg bg-white shadow-lg relative p-6"
-        onClick={(e) => e.stopPropagation()} // 모달 내부 클릭 시 닫힘 방지
+        className="my-10 w-full max-w-3xl rounded-lg bg-white shadow-lg relative p-6"
+        onClick={(e) => e.stopPropagation()}
       >
         {/* 상단 우측 닫기 버튼 */}
         <button
@@ -34,7 +32,7 @@ export default function Modal({ children, onClose }: Props) {
           ✕
         </button>
 
-        {/* 실제 컨텐츠 */}
+        {/* 컨텐츠 */}
         <div className="pb-4">
           {children}
         </div>
