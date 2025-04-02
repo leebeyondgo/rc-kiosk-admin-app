@@ -149,6 +149,7 @@ export default function AdminRecords() {
   };
 
   const toggleAcknowledge = (id: string) => {
+    // This function should now only toggle on item click, not checkbox click
     setAcknowledgedRecords((prev) => {
       const newSet = new Set(prev);
       newSet.has(id) ? newSet.delete(id) : newSet.add(id);
@@ -311,7 +312,7 @@ export default function AdminRecords() {
                     ? "animate-highlight"
                     : "bg-white hover:bg-gray-50"
                 }`}
-                onClick={() => toggleAcknowledge(record.id)} // 이 부분에서 `toggleAcknowledge`로만 `acknowledgedRecords`를 토글합니다
+                onClick={() => toggleAcknowledge(record.id)} // "확인함" 상태를 토글하는 부분
               >
                 {/* 확인함 텍스트 오버레이 */}
                 {isAcknowledged && (
@@ -321,13 +322,13 @@ export default function AdminRecords() {
                 )}
 
                 <div className="absolute top-3 left-3">
-                  {/* 체크박스를 클릭할 때 "확인함" 상태는 변경되지 않도록 stopPropagation() */}
+                  {/* 체크박스를 클릭할 때만 "확인함" 상태가 변경되지 않도록 stopPropagation() */}
                   <input
                     type="checkbox"
                     checked={selectedRecords.has(record.id)}
                     onChange={(e) => {
-                      e.stopPropagation(); // 체크박스 클릭 시 "확인함" 상태가 변경되지 않도록 막음
-                      toggleRecordSelection(record.id); // 체크박스만 토글
+                      e.stopPropagation(); // 체크박스를 클릭할 때 "확인함" 상태 변경 안됨
+                      toggleRecordSelection(record.id); // 체크박스 상태만 변경
                     }}
                   />
                 </div>
