@@ -321,7 +321,7 @@ export default function AdminRecords() {
                   </div>
                 )}
 
-                <div className="absolute top-3 left-3">
+                <div className="absolute top-3 left-3 z-1">
                   {/* 체크박스를 클릭할 때만 "확인함" 상태가 변경되지 않도록 stopPropagation() */}
                   <input
                     type="checkbox"
