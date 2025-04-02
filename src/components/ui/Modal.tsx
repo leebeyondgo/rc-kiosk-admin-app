@@ -38,16 +38,6 @@ export default function Modal({ children, onClose }: Props) {
         <div className="pb-4">
           {children}
         </div>
-
-        {/* 하단 우측 닫기 버튼 */}
-        <div className="mt-6 text-right">
-          <button
-            onClick={onClose}
-            className="text-sm px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded"
-          >
-            닫기
-          </button>
-        </div>
       </div>
     </div>,
     document.body
