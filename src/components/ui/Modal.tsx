@@ -1,4 +1,6 @@
+// src/components/ui/Modal.tsx
 import { useEffect } from "react";
+import { createPortal } from "react-dom";
 
 interface Props {
   children: React.ReactNode;
@@ -6,35 +8,34 @@ interface Props {
 }
 
 export default function Modal({ children, onClose }: Props) {
+  // 스크롤 막기
   useEffect(() => {
-    // 스크롤 막기
+    const originalOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     return () => {
-      // 스크롤 다시 허용
-      document.body.style.overflow = "";
+      document.body.style.overflow = originalOverflow;
     };
   }, []);
 
-  return (
+  return createPortal(
     <div
-      className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4"
-      onClick={onClose} // 배경 클릭 시 닫기
+      className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-start justify-center p-4 pt-10 h-screen overflow-y-auto"
+      onClick={onClose}
     >
       <div
-        className="w-full max-w-3xl max-h-[90vh] rounded-lg bg-white overflow-hidden shadow-lg relative"
-        onClick={(e) => e.stopPropagation()} // 모달 내부 클릭 시 닫기 방지
+        className="w-full max-w-3xl rounded-lg bg-white shadow-lg relative"
+        onClick={(e) => e.stopPropagation()} // 모달 내부 클릭 시 닫힘 방지
       >
-        {/* 닫기 버튼 */}
+        {/* 닫기 버튼 (선택사항) */}
+        <button className="absolute top-3 right-3 ..." onClick={onClose}>✕</button>
         <button
-          className="absolute top-3 right-3 text-gray-500 hover:text-black text-2xl font-bold w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-200 transition"
-          onClick={onClose}
-        >
-          ✕
-        </button>
-        <div className="p-6 overflow-y-auto max-h-[85vh]">
-          {children}
-        </div>
+              onClick={() => setShowModal(false)}
+              className="text-sm px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded"
+            >닫기
+          </button>
+        {children}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
