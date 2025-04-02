@@ -39,7 +39,7 @@ export default function StatisticsModal({ isOpen, onClose, data }: Props) {
       ) : (
         <>
           {/* Chart */}
-          <div className="w-full min-h-[250px] sm:min-h-[300px]">
+          <div className="w-full h-[250px] sm:h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={chartData}>
                 <XAxis dataKey="name" />
@@ -53,7 +53,7 @@ export default function StatisticsModal({ isOpen, onClose, data }: Props) {
           {/* Table */}
           <div className="mt-8">
             <h2 className="text-md font-semibold mb-2">기념품별 선택 수</h2>
-            <div className="overflow-x-auto max-h-[300px]">
+            <div className="overflow-x-auto">
               <table className="w-full text-sm border min-w-[300px]">
                 <thead>
                   <tr className="bg-gray-100">
