@@ -113,7 +113,7 @@ export default function BulkItemManager() {
         <>
           <div className="flex justify-between items-center mb-4">
             <h3 className="font-semibold text-lg">헌혈 장소 목록</h3>
-            <Button variant="outline" onClick={() => setSyncMode(!syncMode)}>
+            <Button variant="soft" onClick={() => setSyncMode(!syncMode)}>
               {syncMode ? "동기화 모드 종료" : "동기화 모드"}
             </Button>
           </div>
