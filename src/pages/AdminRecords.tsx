@@ -311,22 +311,23 @@ export default function AdminRecords() {
                     ? "animate-highlight"
                     : "bg-white hover:bg-gray-50"
                 }`}
-                onClick={() => toggleAcknowledge(record.id)}
+                onClick={() => toggleAcknowledge(record.id)} // 이 부분에서 `toggleAcknowledge`로만 `acknowledgedRecords`를 토글합니다
               >
                 {/* 확인함 텍스트 오버레이 */}
                 {isAcknowledged && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 text-white text-lg font-bold">
+                  <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 text-white text-lg font-bold rounded-lg">
                     확인함
                   </div>
                 )}
 
                 <div className="absolute top-3 left-3">
+                  {/* 체크박스를 클릭할 때 "확인함" 상태는 변경되지 않도록 stopPropagation() */}
                   <input
                     type="checkbox"
                     checked={selectedRecords.has(record.id)}
                     onChange={(e) => {
-                      e.stopPropagation();
-                      toggleRecordSelection(record.id);
+                      e.stopPropagation(); // 체크박스 클릭 시 "확인함" 상태가 변경되지 않도록 막음
+                      toggleRecordSelection(record.id); // 체크박스만 토글
                     }}
                   />
                 </div>
