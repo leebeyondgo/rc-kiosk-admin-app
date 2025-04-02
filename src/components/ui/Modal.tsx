@@ -17,11 +17,11 @@ export default function Modal({ children, onClose }: Props) {
 
   return createPortal(
     <div
-      className="fixed inset-0 z-50 bg-black bg-opacity-50 flex justify-center overflow-y-auto"
+      className="fixed inset-0 z-50 bg-black bg-opacity-50 flex justify-center items-start overflow-y-auto"
       onClick={onClose}
     >
       <div
-        className="my-10 w-full max-w-3xl rounded-lg bg-white shadow-lg relative p-6"
+        className="w-full max-w-3xl rounded-lg bg-white shadow-lg relative p-6 mt-10 mb-10" // 상단 마진만 고정
         onClick={(e) => e.stopPropagation()}
       >
         {/* 상단 우측 닫기 버튼 */}
@@ -33,9 +33,7 @@ export default function Modal({ children, onClose }: Props) {
         </button>
 
         {/* 컨텐츠 */}
-        <div className="pb-4">
-          {children}
-        </div>
+        <div className="pb-4 max-h-[80vh] overflow-y-auto">{children}</div>
       </div>
     </div>,
     document.body
