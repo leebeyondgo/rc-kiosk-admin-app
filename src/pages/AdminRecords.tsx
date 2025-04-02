@@ -363,12 +363,17 @@ export default function AdminRecords() {
           })}
         </div>
       )}
-      {showModal (
+      {showModal && (
         <Modal onClose={() => setShowModal(false)}>
-          <h3 className="text-lg font-semibold mb-3">
-            기념품 통계
-          </h3>
-          <StatisticsModal>
+          <StatisticsModal data={filteredRecords} />
+          <div className="mt-6 text-right">
+            <button
+              onClick={() => setShowModal(false)}
+              className="text-sm px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded"
+            >
+              닫기
+            </button>
+          </div>
         </Modal>
       )}
     </div>

@@ -7,17 +7,12 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { GiftRecord } from "@/types";
-import Modal from "@/components/ui/Modal";
 
 interface Props {
-  isOpen: boolean;
-  onClose: () => void;
   data: GiftRecord[];
 }
 
-export default function StatisticsModal({ isOpen, onClose, data }: Props) {
-  if (!isOpen) return null;
-
+export default function StatisticsModal({ data }: Props) {
   const itemCount: Record<string, number> = {};
 
   data.forEach((record) => {
@@ -31,7 +26,7 @@ export default function StatisticsModal({ isOpen, onClose, data }: Props) {
     .sort((a, b) => b.count - a.count);
 
   return (
-    <Modal onClose={onClose}>
+    <div>
       <h1 className="text-lg font-bold mb-4">기념품 통계</h1>
 
       {chartData.length === 0 ? (
@@ -74,16 +69,6 @@ export default function StatisticsModal({ isOpen, onClose, data }: Props) {
           </div>
         </>
       )}
-
-      {/* 닫기 버튼 */}
-      <div className="mt-6 text-right">
-        <button
-          onClick={onClose}
-          className="text-sm px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded"
-        >
-          닫기
-        </button>
-      </div>
-    </Modal>
+    </div>
   );
 }
