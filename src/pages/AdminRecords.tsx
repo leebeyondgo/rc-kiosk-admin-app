@@ -198,11 +198,11 @@ export default function AdminRecords() {
           {dateMode === 'range' && (
             <div className="flex gap-4">
               <div>
-                <label className="text-sm">시작 날짜</label>
+                <label className="text-sm">시작 날짜 </label>
                 <DatePicker selected={startDate} onChange={(date) => setStartDate(date || today)} />
               </div>
               <div>
-                <label className="text-sm">종료 날짜</label>
+                <label className="text-sm">종료 날짜 </label>
                 <DatePicker selected={endDate} onChange={(date) => setEndDate(date || today)} />
               </div>
             </div>
