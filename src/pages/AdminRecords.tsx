@@ -313,6 +313,13 @@ export default function AdminRecords() {
                 }`}
                 onClick={() => toggleAcknowledge(record.id)}
               >
+                {/* 확인함 텍스트 오버레이 */}
+                {isAcknowledged && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 text-white text-lg font-bold">
+                    확인함
+                  </div>
+                )}
+
                 <div className="absolute top-3 left-3">
                   <input
                     type="checkbox"
