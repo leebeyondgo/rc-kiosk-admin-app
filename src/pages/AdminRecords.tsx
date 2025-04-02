@@ -168,6 +168,19 @@ export default function AdminRecords() {
 
   return (
     <div className="max-w-3xl mx-auto p-4 space-y-8">
+      {showModal && (
+        <Modal onClose={() => setShowModal(false)}>
+          <StatisticsModal data={filteredRecords} />
+          <div className="mt-6 text-right">
+            <button
+              onClick={() => setShowModal(false)}
+              className="text-sm px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded"
+            >
+              닫기
+            </button>
+          </div>
+        </Modal>
+      )}
       <div className="flex flex-col gap-4">
         {/* 날짜 필터 */}
         <div className="space-y-2">
@@ -363,19 +376,7 @@ export default function AdminRecords() {
           })}
         </div>
       )}
-      {showModal && (
-        <Modal onClose={() => setShowModal(false)}>
-          <StatisticsModal data={filteredRecords} />
-          <div className="mt-6 text-right">
-            <button
-              onClick={() => setShowModal(false)}
-              className="text-sm px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded"
-            >
-              닫기
-            </button>
-          </div>
-        </Modal>
-      )}
+      
     </div>
   );
 }
