@@ -5,6 +5,7 @@ import { createClient } from "@supabase/supabase-js";
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from "@/lib/supabaseConfig";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import Modal from "@/components/ui/Modal";
 import StatisticsModal from "@/modals/StatisticsModal"; // 상단에 import
 import { GiftRecord } from "@/types"; // 타입 import
 
@@ -21,6 +22,7 @@ export default function AdminRecords() {
   const [locations, setLocations] = useState<Location[]>([]);
   const [selectedLocations, setSelectedLocations] = useState<string[]>([]);
   const [selectedRecords, setSelectedRecords] = useState<Set<string>>(new Set());
+  const [showModal, setShowModal] = useState(false);
   const [acknowledgedRecords, setAcknowledgedRecords] = useState<Set<string>>(new Set());
   const [highlightedRecords, setHighlightedRecords] = useState<Set<string>>(new Set());
   const [startDate, setStartDate] = useState<Date>(new Date());
@@ -28,7 +30,6 @@ export default function AdminRecords() {
   const [dateMode, setDateMode] = useState<'today' | 'range'>('today');
   const [showLocationDropdown, setShowLocationDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
-  const [isStatsOpen, setIsStatsOpen] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -264,7 +265,7 @@ export default function AdminRecords() {
           </Button>
         </div>
 
-        <Button onClick={() => setIsStatsOpen(true)} variant="default">
+        <Button onClick={() => setShowModal(true)} variant="default">
           통계 보기
         </Button>
 
@@ -362,11 +363,14 @@ export default function AdminRecords() {
           })}
         </div>
       )}
-      <StatisticsModal
-        isOpen={isStatsOpen}
-        onClose={() => setIsStatsOpen(false)}
-        data={filteredRecords}
-      />
+      {showModal (
+        <Modal onClose={() => setShowModal(false)}>
+          <h3 className="text-lg font-semibold mb-3">
+            기념품 통계
+          </h3>
+          <StatisticsModal>
+        </Modal>
+      )}
     </div>
   );
 }

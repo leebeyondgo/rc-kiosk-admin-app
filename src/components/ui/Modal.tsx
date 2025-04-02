@@ -17,7 +17,7 @@ export default function Modal({ children, onClose }: Props) {
 
   return (
     <div
-      className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-start justify-center p-4 pt-10"
+      className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4"
       onClick={onClose} // 배경 클릭 시 닫기
     >
       <div
