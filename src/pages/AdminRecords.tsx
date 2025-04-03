@@ -148,15 +148,6 @@ export default function AdminRecords() {
     });
   };
 
-  const toggleAcknowledge = (id: string) => {
-    // This function should now only toggle on item click, not checkbox click
-    setAcknowledgedRecords((prev) => {
-      const newSet = new Set(prev);
-      newSet.has(id) ? newSet.delete(id) : newSet.add(id);
-      return newSet;
-    });
-  };
-
   const toggleAcknowledge = async (id: string, current: boolean) => {
     const { error } = await supabase
       .from("gift_records")
