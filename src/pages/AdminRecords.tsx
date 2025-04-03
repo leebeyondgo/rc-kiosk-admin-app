@@ -20,16 +20,29 @@ export default function AdminRecords() {
   const [records, setRecords] = useState<GiftRecord[]>([]);
   const [filteredRecords, setFilteredRecords] = useState<GiftRecord[]>([]);
   const [locations, setLocations] = useState<Location[]>([]);
-  const [selectedLocations, setSelectedLocations] = useState<string[]>([]);
+  const [selectedLocations, setSelectedLocations] = useState<string[]>(() => {
+    const stored = localStorage.getItem("selectedLocations");
+    return stored ? JSON.parse(stored) : [];
+  });
   const [selectedRecords, setSelectedRecords] = useState<Set<string>>(new Set());
   const [showModal, setShowModal] = useState(false);
   const [highlightedRecords, setHighlightedRecords] = useState<Set<string>>(new Set());
-  const [startDate, setStartDate] = useState<Date>(new Date());
-  const [endDate, setEndDate] = useState<Date>(new Date());
-  const [dateMode, setDateMode] = useState<'today' | 'range'>('today');
+  const [startDate, setStartDate] = useState<Date>(() => {
+    const stored = localStorage.getItem("startDate");
+    return stored ? new Date(stored) : new Date();
+  });
+  const [endDate, setEndDate] = useState<Date>(() => {
+    const stored = localStorage.getItem("endDate");
+    return stored ? new Date(stored) : new Date();
+  });
+  const [dateMode, setDateMode] = useState<"today" | "range">(() => {
+    return (localStorage.getItem("dateMode") as "today" | "range") || "today";
+  });
   const [showLocationDropdown, setShowLocationDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
-  const [ackFilter, setAckFilter] = useState<"all" | "paid" | "unpaid">("all");
+  const [ackFilter, setAckFilter] = useState<"all" | "paid" | "unpaid">(() => {
+    return (localStorage.getItem("ackFilter") as "all" | "paid" | "unpaid") || "all";
+  });
 
   useEffect(() => {
     const fetchData = async () => {
@@ -111,7 +124,27 @@ export default function AdminRecords() {
           : !r.is_paid;
     
       return matchesLocation && matchesDate && matchesAck;
-    });    
+    });
+
+    useEffect(() => {
+      localStorage.setItem("selectedLocations", JSON.stringify(selectedLocations));
+    }, [selectedLocations]);
+    
+    useEffect(() => {
+      localStorage.setItem("dateMode", dateMode);
+    }, [dateMode]);
+    
+    useEffect(() => {
+      localStorage.setItem("startDate", startDate.toISOString());
+    }, [startDate]);
+    
+    useEffect(() => {
+      localStorage.setItem("endDate", endDate.toISOString());
+    }, [endDate]);
+    
+    useEffect(() => {
+      localStorage.setItem("ackFilter", ackFilter);
+    }, [ackFilter]);    
 
     setFilteredRecords(filtered);
 
@@ -131,6 +164,21 @@ export default function AdminRecords() {
       }
     }
   };
+
+  const resetFilters = () => {
+    setSelectedLocations([]);
+    setDateMode("today");
+    setStartDate(today);
+    setEndDate(today);
+    setAckFilter("all");
+  
+    // localStorage도 같이 초기화
+    localStorage.removeItem("selectedLocations");
+    localStorage.removeItem("dateMode");
+    localStorage.removeItem("startDate");
+    localStorage.removeItem("endDate");
+    localStorage.removeItem("ackFilter");
+  };  
 
   const handleBulkDelete = async () => {
     if (selectedRecords.size === 0 || !confirm("선택된 항목들을 삭제하시겠습니까?")) return;
@@ -294,15 +342,7 @@ export default function AdminRecords() {
         </div>
         {/* 컨트롤 버튼 */}
         <div className="flex justify-between items-center">
-          <Button
-            onClick={() => {
-              setSelectedLocations([]);
-              setDateMode('today');
-              setStartDate(today);
-              setEndDate(today);
-            }}
-            variant="soft"
-          >
+          <Button onClick={resetFilters} variant="soft">
             필터 초기화
           </Button>
           <Button onClick={handleBulkDelete} variant="destructive" disabled={selectedRecords.size === 0}>
