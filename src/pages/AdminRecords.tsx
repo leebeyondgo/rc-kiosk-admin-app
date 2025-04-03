@@ -126,26 +126,6 @@ export default function AdminRecords() {
       return matchesLocation && matchesDate && matchesAck;
     });
 
-    useEffect(() => {
-      localStorage.setItem("selectedLocations", JSON.stringify(selectedLocations));
-    }, [selectedLocations]);
-    
-    useEffect(() => {
-      localStorage.setItem("dateMode", dateMode);
-    }, [dateMode]);
-    
-    useEffect(() => {
-      localStorage.setItem("startDate", startDate.toISOString());
-    }, [startDate]);
-    
-    useEffect(() => {
-      localStorage.setItem("endDate", endDate.toISOString());
-    }, [endDate]);
-    
-    useEffect(() => {
-      localStorage.setItem("ackFilter", ackFilter);
-    }, [ackFilter]);    
-
     setFilteredRecords(filtered);
 
     setSelectedRecords((prev) => {
@@ -153,6 +133,26 @@ export default function AdminRecords() {
       return new Set([...prev].filter((id) => filteredIds.has(id)));
     });
   }, [records, selectedLocations, startDate, endDate, ackFilter]);
+
+  useEffect(() => {
+    localStorage.setItem("selectedLocations", JSON.stringify(selectedLocations));
+  }, [selectedLocations]);
+  
+  useEffect(() => {
+    localStorage.setItem("dateMode", dateMode);
+  }, [dateMode]);
+  
+  useEffect(() => {
+    localStorage.setItem("startDate", startDate.toISOString());
+  }, [startDate]);
+  
+  useEffect(() => {
+    localStorage.setItem("endDate", endDate.toISOString());
+  }, [endDate]);
+  
+  useEffect(() => {
+    localStorage.setItem("ackFilter", ackFilter);
+  }, [ackFilter]);    
 
   const handleDelete = async (id: string) => {
     if (confirm("정말 삭제하시겠습니까?")) {
