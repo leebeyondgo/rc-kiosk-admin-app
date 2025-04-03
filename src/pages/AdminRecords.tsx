@@ -23,13 +23,13 @@ export default function AdminRecords() {
   const [selectedLocations, setSelectedLocations] = useState<string[]>([]);
   const [selectedRecords, setSelectedRecords] = useState<Set<string>>(new Set());
   const [showModal, setShowModal] = useState(false);
-  const [acknowledgedRecords, setAcknowledgedRecords] = useState<Set<string>>(new Set());
   const [highlightedRecords, setHighlightedRecords] = useState<Set<string>>(new Set());
   const [startDate, setStartDate] = useState<Date>(new Date());
   const [endDate, setEndDate] = useState<Date>(new Date());
   const [dateMode, setDateMode] = useState<'today' | 'range'>('today');
   const [showLocationDropdown, setShowLocationDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
+  const [ackFilter, setAckFilter] = useState<"all" | "paid" | "unpaid">("all");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -93,17 +93,25 @@ export default function AdminRecords() {
     const filtered = records.filter((r) => {
       const matchesLocation =
         selectedLocations.length === 0 || selectedLocations.includes(r.location_id);
-
+    
       if (!r.timestamp) return false;
-
+    
       const recordDate = new Date(r.timestamp);
       const start = new Date(startDate);
       const end = new Date(endDate);
       start.setHours(0, 0, 0, 0);
       end.setHours(23, 59, 59, 999);
-
-      return matchesLocation && recordDate >= start && recordDate <= end;
-    });
+    
+      const matchesDate = recordDate >= start && recordDate <= end;
+      const matchesAck =
+        ackFilter === "all"
+          ? true
+          : ackFilter === "paid"
+          ? r.is_paid
+          : !r.is_paid;
+    
+      return matchesLocation && matchesDate && matchesAck;
+    });    
 
     setFilteredRecords(filtered);
 
@@ -111,7 +119,7 @@ export default function AdminRecords() {
       const filteredIds = new Set(filtered.map((r) => r.id));
       return new Set([...prev].filter((id) => filteredIds.has(id)));
     });
-  }, [records, selectedLocations, startDate, endDate]);
+  }, [records, selectedLocations, startDate, endDate, ackFilter]);
 
   const handleDelete = async (id: string) => {
     if (confirm("정말 삭제하시겠습니까?")) {
@@ -243,7 +251,39 @@ export default function AdminRecords() {
             </div>
           )}
         </div>
-
+        {/* 확인 상태 필터 */}
+        <div className="space-y-2">
+          <label className="font-semibold">확인 상태</label>
+          <div className="flex items-center gap-4">
+            <label className="flex items-center gap-1">
+              <input
+                type="radio"
+                value="all"
+                checked={ackFilter === "all"}
+                onChange={() => setAckFilter("all")}
+              />
+              전체
+            </label>
+            <label className="flex items-center gap-1">
+              <input
+                type="radio"
+                value="paid"
+                checked={ackFilter === "paid"}
+                onChange={() => setAckFilter("paid")}
+              />
+              확인됨
+            </label>
+            <label className="flex items-center gap-1">
+              <input
+                type="radio"
+                value="unpaid"
+                checked={ackFilter === "unpaid"}
+                onChange={() => setAckFilter("unpaid")}
+              />
+              미확인
+            </label>
+          </div>
+        </div>
         {/* 컨트롤 버튼 */}
         <div className="flex justify-between items-center">
           <Button
@@ -313,7 +353,7 @@ export default function AdminRecords() {
                 {/* 확인함 텍스트 오버레이 */}
                 {isAcknowledged && (
                   <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 text-white text-lg font-bold rounded-lg">
-                    확인함
+                    지급함
                   </div>
                 )}
 
