@@ -157,11 +157,16 @@ export default function AdminRecords() {
     });
   };
 
-  const toggleSelectAll = () => {
-    if (selectedRecords.size === filteredRecords.length) {
-      setSelectedRecords(new Set());
-    } else {
-      setSelectedRecords(new Set(filteredRecords.map((r) => r.id)));
+  const toggleAcknowledge = async (id: string, current: boolean) => {
+    const { error } = await supabase
+      .from("gift_records")
+      .update({ is_paid: !current })
+      .eq("id", id);
+  
+    if (!error) {
+      setRecords((prev) =>
+        prev.map((r) => (r.id === id ? { ...r, is_paid: !current } : r))
+      );
     }
   };
 
@@ -299,7 +304,7 @@ export default function AdminRecords() {
               items = [];
             }
 
-            const isAcknowledged = acknowledgedRecords.has(record.id);
+            const isAcknowledged = record.is_paid;
             const isHighlighted = highlightedRecords.has(record.id);
 
             return (
@@ -312,7 +317,7 @@ export default function AdminRecords() {
                     ? "animate-highlight"
                     : "bg-white hover:bg-gray-50"
                 }`}
-                onClick={() => toggleAcknowledge(record.id)} // "확인함" 상태를 토글하는 부분
+                onClick={() => toggleAcknowledge(record.id, record.is_paid || false)} // "확인함" 상태를 토글하는 부분
               >
                 {/* 확인함 텍스트 오버레이 */}
                 {isAcknowledged && (
