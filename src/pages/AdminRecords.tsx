@@ -309,7 +309,7 @@ export default function AdminRecords() {
         </div>
         {/* 확인 상태 필터 */}
         <div className="space-y-2">
-          <label className="font-semibold">확인 상태</label>
+          <label className="font-semibold">지급 상태</label>
           <div className="flex items-center gap-4">
             <label className="flex items-center gap-1">
               <input
@@ -327,7 +327,7 @@ export default function AdminRecords() {
                 checked={ackFilter === "paid"}
                 onChange={() => setAckFilter("paid")}
               />
-              확인됨
+              지급함
             </label>
             <label className="flex items-center gap-1">
               <input
@@ -336,7 +336,7 @@ export default function AdminRecords() {
                 checked={ackFilter === "unpaid"}
                 onChange={() => setAckFilter("unpaid")}
               />
-              미확인
+              미지급
             </label>
           </div>
         </div>
