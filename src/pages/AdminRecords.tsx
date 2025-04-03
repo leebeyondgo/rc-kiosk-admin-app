@@ -156,6 +156,14 @@ export default function AdminRecords() {
     });
   };
 
+  const toggleSelectAll = () => {
+    if (selectedRecords.size === filteredRecords.length) {
+      setSelectedRecords(new Set());
+    } else {
+      setSelectedRecords(new Set(filteredRecords.map((r) => r.id)));
+    }
+  };  
+
   const toggleAcknowledge = async (id: string, current: boolean) => {
     const { error } = await supabase
       .from("gift_records")
