@@ -67,25 +67,30 @@ export default function ImageSelectorModal({ onSelect, onClose }: Props) {
       <h2 className="text-lg font-semibold mb-4">이미지 선택</h2>
 
       <div className="grid grid-cols-3 gap-3 max-h-[400px] overflow-y-auto">
-        {images.map((url) => (
-          <div key={url} className="relative group border rounded p-1">
-            <img
-              src={url}
-              alt="img"
-              className="w-full aspect-square object-contain rounded cursor-pointer"
-              onClick={() => {
-                onSelect(url);
-                onClose();
-              }}
-            />
-            <button
-              className="absolute top-1 right-1 bg-white p-1 rounded-full shadow hidden group-hover:block"
-              onClick={() => handleDelete(url)}
-            >
-              <Trash2 size={14} className="text-red-500" />
-            </button>
-          </div>
-        ))}
+        {images.map((url) => {
+          const fileName = url.split("/").pop()?.split("?")[0] || "image";
+          const baseName = fileName.replace(/\.[^/.]+$/, "").replace(/^\d+_/, "");
+          return (
+            <div key={url} className="relative group border rounded p-1">
+              <img
+                src={url}
+                alt={baseName}
+                className="w-full aspect-square object-contain rounded cursor-pointer"
+                onClick={() => {
+                  onSelect(url);
+                  onClose();
+                }}
+              />
+              <button
+                className="absolute top-1 right-1 bg-white p-1 rounded-full shadow hidden group-hover:block"
+                onClick={() => handleDelete(url)}
+              >
+                <Trash2 size={14} className="text-red-500" />
+              </button>
+            </div>
+          );
+        })}
+
       </div>
 
       <div className="mt-4">

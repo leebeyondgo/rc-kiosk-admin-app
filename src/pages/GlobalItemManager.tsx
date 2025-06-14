@@ -115,7 +115,7 @@ export default function GlobalItemManager() {
           {newItem.image_url && (
             <img
               src={newItem.image_url}
-              alt="선택된 이미지"
+              alt={newItem.name ? `${newItem.name} 이미지` : "선택된 기념품 이미지"}
               className="w-32 h-20 object-contain border rounded"
             />
           )}
@@ -213,6 +213,7 @@ export default function GlobalItemManager() {
             {editingItem.image_url && (
               <img
                 src={editingItem.image_url}
+                alt={editingItem.name ? `${editingItem.name} 이미지` : "편집 중인 기념품 이미지"}
                 className="w-32 h-20 object-contain border rounded"
               />
             )}
