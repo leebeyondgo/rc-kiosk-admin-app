@@ -81,6 +81,7 @@ export default function ImageSelectorModal({ onSelect, onClose }: Props) {
             <button
               className="absolute top-1 right-1 bg-white p-1 rounded-full shadow hidden group-hover:block"
               onClick={() => handleDelete(url)}
+              aria-label="이미지 삭제"
             >
               <Trash2 size={14} className="text-red-500" />
             </button>

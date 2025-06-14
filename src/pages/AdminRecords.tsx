@@ -423,6 +423,7 @@ export default function AdminRecords() {
                     handleDelete(record.id);
                   }}
                   className="absolute top-3 right-3 text-gray-400 hover:text-red-500"
+                  aria-label="기록 삭제"
                 >
                   <Trash2 size={16} />
                 </button>
