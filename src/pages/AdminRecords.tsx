@@ -9,6 +9,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import Modal from "@/components/ui/Modal";
 import StatisticsModal from "@/modals/StatisticsModal"; // 상단에 import
 import { GiftRecord } from "@/types"; // 타입 import
+import { useToast } from "@/components/ui/Toast";
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -40,6 +41,7 @@ export default function AdminRecords() {
   const [dateMode, setDateMode] = useState<"today" | "range">(() => {
     return (localStorage.getItem("dateMode") as "today" | "range") || "today";
   });
+  const toast = useToast();
   const [showLocationDropdown, setShowLocationDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   const [ackFilter, setAckFilter] = useState<"all" | "paid" | "unpaid">(() => {
@@ -164,7 +166,7 @@ export default function AdminRecords() {
       if (!error) {
         setRecords((prev) => prev.filter((r) => r.id !== id));
       } else {
-        alert("삭제 실패");
+        toast("삭제 실패");
       }
     }
   };
@@ -196,7 +198,7 @@ export default function AdminRecords() {
       setRecords((prev) => prev.filter((r) => !selectedRecords.has(r.id)));
       setSelectedRecords(new Set());
     } else {
-      alert("일괄 삭제 실패");
+      toast("일괄 삭제 실패");
     }
   };
 
@@ -477,3 +479,4 @@ export default function AdminRecords() {
     </div>
   );
 }
+

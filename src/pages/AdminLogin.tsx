@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useToast } from "@/components/ui/Toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { createClient } from "@supabase/supabase-js";
@@ -14,6 +15,7 @@ interface AdminLoginProps {
 export default function AdminLogin({ onBack, onLoginSuccess }: AdminLoginProps) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const toast = useToast();
 
   const handleLogin = async () => {
     const { data, error } = await supabase
@@ -23,7 +25,7 @@ export default function AdminLogin({ onBack, onLoginSuccess }: AdminLoginProps) 
       .single();
 
     if (error) {
-      alert("서버 오류가 발생했습니다.");
+      toast("서버 오류가 발생했습니다.");
       console.error(error);
       return;
     }
@@ -32,7 +34,7 @@ export default function AdminLogin({ onBack, onLoginSuccess }: AdminLoginProps) 
       localStorage.setItem("isAdmin", "true");
       onLoginSuccess();
     } else {
-      alert("아이디 또는 비밀번호가 틀렸습니다.");
+      toast("아이디 또는 비밀번호가 틀렸습니다.");
     }
   };
 
@@ -72,3 +74,4 @@ export default function AdminLogin({ onBack, onLoginSuccess }: AdminLoginProps) 
     </div>
   );
 }
+

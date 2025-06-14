@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import Modal from "@/components/ui/Modal";
 import AdminItems from "@/modals/AdminItems";
 import GlobalItemManager from "@/pages/GlobalItemManager";
+import { useToast } from "@/components/ui/Toast";
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -20,6 +21,7 @@ export default function BulkItemManager() {
   const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [activeTab, setActiveTab] = useState<Tab>("location");
+  const toast = useToast();
 
   // 동기화 관련 상태
   const [syncMode, setSyncMode] = useState(false);
@@ -67,7 +69,7 @@ export default function BulkItemManager() {
       .select("*")
       .eq("location_id", syncSourceId);
 
-    if (!sourceItems) return alert("기준 장소 기념품 정보를 불러오지 못했습니다.");
+    if (!sourceItems) return toast("기준 장소 기념품 정보를 불러오지 못했습니다.");
 
     await supabase.from("location_gift_items")
       .delete()
@@ -81,9 +83,9 @@ export default function BulkItemManager() {
     );
 
     const { error } = await supabase.from("location_gift_items").insert(payload);
-    if (error) return alert("동기화 실패: " + error.message);
+    if (error) return toast("동기화 실패: " + error.message);
 
-    alert("동기화가 완료되었습니다.");
+    toast("동기화가 완료되었습니다.");
     setSyncMode(false);
     setSyncSourceId("");
     setSyncTargetIds([]);
