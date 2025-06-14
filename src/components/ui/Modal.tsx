@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 
 interface Props {
@@ -7,13 +7,59 @@ interface Props {
 }
 
 export default function Modal({ children, onClose }: Props) {
+  const modalRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     const originalOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = originalOverflow;
+
+    const previouslyFocused = document.activeElement as HTMLElement | null;
+    const selector =
+      'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+    const focusFirst = () => {
+      const first = modalRef.current?.querySelector<HTMLElement>(selector);
+      first?.focus();
     };
-  }, []);
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        onClose();
+        return;
+      }
+
+      if (e.key === "Tab" && modalRef.current) {
+        const focusable = modalRef.current.querySelectorAll<HTMLElement>(selector);
+        if (!focusable.length) {
+          return;
+        }
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+
+        if (e.shiftKey) {
+          if (document.activeElement === first) {
+            e.preventDefault();
+            last.focus();
+          }
+        } else {
+          if (document.activeElement === last) {
+            e.preventDefault();
+            first.focus();
+          }
+        }
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    focusFirst();
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = originalOverflow;
+      previouslyFocused?.focus();
+    };
+  }, [onClose]);
 
   return createPortal(
     <div
@@ -21,6 +67,7 @@ export default function Modal({ children, onClose }: Props) {
       onClick={onClose}
     >
       <div
+        ref={modalRef}
         className="w-full max-w-3xl rounded-lg bg-white shadow-lg relative p-6 mt-10 mb-10" // 상단 마진만 고정
         onClick={(e) => e.stopPropagation()}
       >
