@@ -4,6 +4,7 @@ import { SUPABASE_URL, SUPABASE_ANON_KEY } from "@/lib/supabaseConfig";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import Loader from "@/components/ui/Loader";
 import { Trash2, Pencil } from "lucide-react";
 import ImageSelectorModal from "@/modals/ImageSelectorModal";
 import Modal from "@/components/ui/Modal";
@@ -127,7 +128,13 @@ export default function GlobalItemManager() {
         </div>
 
         <Button onClick={handleAdd} disabled={loading}>
-          {loading ? "추가 중..." : "기념품 추가"}
+          {loading ? (
+            <span className="flex items-center gap-2">
+              <Loader className="h-4 w-4" /> 추가 중...
+            </span>
+          ) : (
+            "기념품 추가"
+          )}
         </Button>
       </div>
 

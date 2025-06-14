@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
+import Loader from "@/components/ui/Loader";
 import { Trash2 } from "lucide-react";
 import { createClient } from "@supabase/supabase-js";
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from "@/lib/supabaseConfig";
@@ -27,6 +28,7 @@ export default function AdminRecords() {
   const [selectedRecords, setSelectedRecords] = useState<Set<string>>(new Set());
   const [showModal, setShowModal] = useState(false);
   const [highlightedRecords, setHighlightedRecords] = useState<Set<string>>(new Set());
+  const [loading, setLoading] = useState(true);
   const [startDate, setStartDate] = useState<Date>(() => {
     const stored = localStorage.getItem("startDate");
     return stored ? new Date(stored) : new Date();
@@ -46,6 +48,7 @@ export default function AdminRecords() {
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
       const { data: recordsData } = await supabase.from("gift_records").select("*");
       const { data: locationData } = await supabase.from("donation_locations").select("*");
 
@@ -59,6 +62,7 @@ export default function AdminRecords() {
       }
 
       setLocations(locationData ?? []);
+      setLoading(false);
     };
 
     fetchData();
@@ -229,7 +233,13 @@ export default function AdminRecords() {
 
   return (
     <div className="max-w-3xl mx-auto p-4 space-y-8">
-      <div className="flex flex-col gap-4">
+      {loading ? (
+        <div className="flex justify-center py-10">
+          <Loader className="h-8 w-8" />
+        </div>
+      ) : (
+        <>
+          <div className="flex flex-col gap-4">
         {/* 날짜 필터 */}
         <div className="space-y-2">
           <div className="flex items-center gap-4">
@@ -456,6 +466,8 @@ export default function AdminRecords() {
             );
           })}
         </div>
+      )}
+      </>
       )}
       {showModal && (
         <Modal onClose={() => setShowModal(false)}>
