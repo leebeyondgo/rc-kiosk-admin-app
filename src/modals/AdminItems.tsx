@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowUp, ArrowDown, Trash2 } from "lucide-react";
 import { createClient } from "@supabase/supabase-js";
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from "@/lib/supabaseConfig";
+import { useToast } from "@/components/ui/Toast";
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -32,6 +33,7 @@ export default function AdminItems({ locationId }: Props) {
   const [locationItems, setLocationItems] = useState<LocationGiftItem[]>([]);
   const [newGiftItemId, setNewGiftItemId] = useState<string>("");
   const [newCategory, setNewCategory] = useState<"A" | "B">("A");
+  const toast = useToast();
 
   const fetchData = async () => {
     const { data: giftData } = await supabase.from("gift_items").select("*");
@@ -63,7 +65,7 @@ export default function AdminItems({ locationId }: Props) {
       .eq("id", id);
 
     if (error) {
-      alert("변경 저장 실패: " + error.message);
+      toast("변경 저장 실패: " + error.message);
     }
   };
 
@@ -79,7 +81,7 @@ export default function AdminItems({ locationId }: Props) {
 
     const existing = locationItems.find((i) => i.gift_item_id === newGiftItemId);
     if (existing) {
-      alert("이미 추가된 기념품입니다.");
+      toast("이미 추가된 기념품입니다.");
       return;
     }
 
@@ -101,7 +103,7 @@ export default function AdminItems({ locationId }: Props) {
     ]);
 
     if (error) {
-      alert("추가 실패: " + error.message);
+      toast("추가 실패: " + error.message);
     } else {
       setNewGiftItemId("");
       fetchData();
@@ -265,3 +267,4 @@ export default function AdminItems({ locationId }: Props) {
     </div>
   );
 }
+

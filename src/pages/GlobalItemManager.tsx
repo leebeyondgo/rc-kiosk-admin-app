@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useToast } from "@/components/ui/Toast";
 import { createClient } from "@supabase/supabase-js";
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from "@/lib/supabaseConfig";
 import { Input } from "@/components/ui/input";
@@ -24,6 +25,7 @@ export default function GlobalItemManager() {
   const [showImageModal, setShowImageModal] = useState(false);
   const [editingItem, setEditingItem] = useState<GiftItem | null>(null);
   const [showEditModal, setShowEditModal] = useState(false);
+  const toast = useToast();
 
   const fetchItems = async () => {
     const { data } = await supabase.from("gift_items").select("*").order("name", { ascending: true });
@@ -36,7 +38,7 @@ export default function GlobalItemManager() {
 
   const handleAdd = async () => {
     if (!newItem.name) {
-      alert("기념품 이름을 입력해주세요.");
+      toast("기념품 이름을 입력해주세요.");
       return;
     }
 
@@ -49,7 +51,7 @@ export default function GlobalItemManager() {
     }]);
 
     if (error) {
-      alert("추가 실패: " + error.message);
+      toast("추가 실패: " + error.message);
     } else {
       setNewItem({});
       fetchItems();
@@ -62,7 +64,7 @@ export default function GlobalItemManager() {
     if (!confirm("정말 삭제하시겠습니까?")) return;
     const { error } = await supabase.from("gift_items").delete().eq("id", id);
     if (error) {
-      alert("삭제 실패: " + error.message);
+      toast("삭제 실패: " + error.message);
     } else {
       fetchItems();
     }
@@ -81,7 +83,7 @@ export default function GlobalItemManager() {
       .eq("id", editingItem.id);
 
     if (error) {
-      alert("수정 실패: " + error.message);
+      toast("수정 실패: " + error.message);
     } else {
       setShowEditModal(false);
       setEditingItem(null);
@@ -240,3 +242,4 @@ export default function GlobalItemManager() {
     </div>
   );
 }
+

@@ -4,6 +4,7 @@ import { SUPABASE_URL, SUPABASE_ANON_KEY } from "@/lib/supabaseConfig";
 import { Button } from "@/components/ui/button";
 import Modal from "@/components/ui/Modal";
 import { Trash2, Upload } from "lucide-react";
+import { useToast } from "@/components/ui/Toast";
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -15,6 +16,7 @@ interface Props {
 export default function ImageSelectorModal({ onSelect, onClose }: Props) {
   const [images, setImages] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
+  const toast = useToast();
 
   const fetchImages = async () => {
     const { data } = await supabase.storage.from("gift-images").list("", {
@@ -44,7 +46,7 @@ export default function ImageSelectorModal({ onSelect, onClose }: Props) {
     if (!error) {
       await fetchImages();
     } else {
-      alert("업로드 실패");
+      toast("업로드 실패");
     }
 
     setUploading(false);
@@ -58,7 +60,7 @@ export default function ImageSelectorModal({ onSelect, onClose }: Props) {
     if (!error) {
       await fetchImages();
     } else {
-      alert("삭제 실패");
+      toast("삭제 실패");
     }
   };
 
@@ -98,3 +100,4 @@ export default function ImageSelectorModal({ onSelect, onClose }: Props) {
     </Modal>
   );
 }
+
