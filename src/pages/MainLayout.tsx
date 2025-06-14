@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
@@ -23,6 +23,7 @@ export default function MainLayout() {
   const navigate = useNavigate();
   const [isAdmin, setIsAdmin] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const sidebarRef = useRef<HTMLDivElement>(null);
   const [activeTab, setActiveTab] = useState<
     "selector" | "records" | "bulkItems" | "login"
   >(() => localStorage.getItem("activeTab") as any || "selector");
@@ -34,6 +35,47 @@ export default function MainLayout() {
   useEffect(() => {
     localStorage.setItem("activeTab", activeTab);
   }, [activeTab]);
+
+  useEffect(() => {
+    if (!sidebarOpen) return;
+
+    const previouslyFocused = document.activeElement as HTMLElement | null;
+    const selector =
+      'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+    const focusable = sidebarRef.current?.querySelectorAll<HTMLElement>(selector) || [];
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        setSidebarOpen(false);
+        return;
+      }
+      if (e.key === 'Tab' && focusable.length) {
+        if (e.shiftKey) {
+          if (document.activeElement === first) {
+            e.preventDefault();
+            last?.focus();
+          }
+        } else {
+          if (document.activeElement === last) {
+            e.preventDefault();
+            first?.focus();
+          }
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    first?.focus();
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      previouslyFocused?.focus();
+    };
+  }, [sidebarOpen]);
 
   const handleLogout = () => {
     localStorage.removeItem("isAdmin");
@@ -95,8 +137,9 @@ export default function MainLayout() {
 
       {/* 사이드 메뉴 */}
       <div
+        ref={sidebarRef}
         className={`
-          fixed top-0 left-0 h-full bg-white shadow-lg z-50 transform 
+          fixed top-0 left-0 h-full bg-white shadow-lg z-50 transform
           transition-transform duration-300 w-64 p-4 flex flex-col justify-between
           ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
         `}
