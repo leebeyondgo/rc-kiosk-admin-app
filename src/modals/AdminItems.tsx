@@ -161,6 +161,7 @@ export default function AdminItems({ locationId }: Props) {
                   variant="ghost"
                   onClick={() => moveItem(category, index, "up")}
                   disabled={index === 0}
+                  aria-label="위로 이동"
                 >
                   <ArrowUp size={16} />
                 </Button>
@@ -169,6 +170,7 @@ export default function AdminItems({ locationId }: Props) {
                   variant="ghost"
                   onClick={() => moveItem(category, index, "down")}
                   disabled={index === filtered.length - 1}
+                  aria-label="아래로 이동"
                 >
                   <ArrowDown size={16} />
                 </Button>
@@ -212,6 +214,7 @@ export default function AdminItems({ locationId }: Props) {
                   variant="ghost"
                   className="text-red-500 ml-auto"
                   onClick={() => handleDelete(item.id)}
+                  aria-label="항목 삭제"
                 >
                   <Trash2 size={16} />
                 </Button>

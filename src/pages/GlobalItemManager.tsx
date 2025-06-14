@@ -162,6 +162,7 @@ export default function GlobalItemManager() {
                     setEditingItem(item);
                     setShowEditModal(true);
                   }}
+                  aria-label="편집"
                 >
                   <Pencil size={16} />
                 </Button>
@@ -169,6 +170,7 @@ export default function GlobalItemManager() {
                   variant="ghost"
                   onClick={() => handleDelete(item.id)}
                   className="text-red-500"
+                  aria-label="삭제"
                 >
                   <Trash2 size={16} />
                 </Button>

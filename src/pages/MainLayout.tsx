@@ -89,6 +89,7 @@ export default function MainLayout() {
           setSidebarOpen(!sidebarOpen);
         }}
         className="fixed top-4 left-4 z-40 p-2 bg-white rounded-full shadow-md"
+        aria-label="메뉴 열기"
       >
         <Menu />
       </button>
@@ -108,6 +109,7 @@ export default function MainLayout() {
             <button
               onClick={() => setSidebarOpen(false)}
               className="text-gray-500 hover:text-black"
+              aria-label="메뉴 닫기"
             >
               &times;
             </button>
