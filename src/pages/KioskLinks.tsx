@@ -52,6 +52,7 @@ export default function KioskLinks() {
               value={getKioskUrl(loc.id)}
               size={150}
               includeMargin={true}
+              aria-label={`키오스크 ${loc.name} 페이지 QR`}
             />
 
             {/* 다운로드용 고해상도 QR코드 (숨김 처리) */}
@@ -61,6 +62,7 @@ export default function KioskLinks() {
                 value={getKioskUrl(loc.id)}
                 size={1024}  // 고해상도 설정 (1024px 권장)
                 includeMargin={true}
+                aria-label={`키오스크 ${loc.name} 페이지 QR 다운로드용`}
               />
             </div>
 
