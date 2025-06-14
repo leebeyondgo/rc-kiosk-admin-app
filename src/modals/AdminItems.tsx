@@ -1,6 +1,12 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowUp, ArrowDown, Trash2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
+import {
+  DragDropContext,
+  Droppable,
+  Draggable,
+  DropResult,
+} from "react-beautiful-dnd";
 import { createClient } from "@supabase/supabase-js";
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from "@/lib/supabaseConfig";
 
@@ -108,34 +114,48 @@ export default function AdminItems({ locationId }: Props) {
     }
   };
 
-  const moveItem = async (
-    category: "A" | "B",
-    index: number,
-    direction: "up" | "down"
-  ) => {
-    const categoryItems = locationItems
-      .filter((item) => item.category === category)
+  const handleDragEnd = async (result: DropResult) => {
+    const { destination, source } = result;
+    if (!destination) return;
+    if (
+      destination.droppableId !== source.droppableId ||
+      destination.index === source.index
+    ) {
+      return;
+    }
+
+    const category = source.droppableId as "A" | "B";
+    const items = locationItems
+      .filter((i) => i.category === category)
       .sort((a, b) => a.sort_order - b.sort_order);
 
-    const targetIndex = direction === "up" ? index - 1 : index + 1;
-    if (targetIndex < 0 || targetIndex >= categoryItems.length) return;
+    const [moved] = items.splice(source.index, 1);
+    items.splice(destination.index, 0, moved);
 
-    const updated = [...categoryItems];
-    const current = updated[index];
-    const target = updated[targetIndex];
+    const updated = items.map((item, idx) => ({
+      ...item,
+      sort_order: idx + 1,
+    }));
 
-    // swap sort_order
-    const temp = current.sort_order;
-    current.sort_order = target.sort_order;
-    target.sort_order = temp;
+    const newState = locationItems.map((item) => {
+      const u = updated.find((ui) => ui.id === item.id);
+      return u ? u : item;
+    });
 
-    await Promise.all([
-      supabase.from("location_gift_items").update({ sort_order: current.sort_order }).eq("id", current.id),
-      supabase.from("location_gift_items").update({ sort_order: target.sort_order }).eq("id", target.id),
-    ]);
+    setLocationItems(newState);
+
+    await Promise.all(
+      updated.map((u) =>
+        supabase
+          .from("location_gift_items")
+          .update({ sort_order: u.sort_order })
+          .eq("id", u.id)
+      )
+    );
 
     fetchData();
   };
+
 
   const renderCategory = (category: "A" | "B") => {
     const filtered = locationItems
@@ -143,87 +163,84 @@ export default function AdminItems({ locationId }: Props) {
       .sort((a, b) => a.sort_order - b.sort_order);
 
     return (
-      <div className="space-y-4">
-        {filtered.map((item, index) => {
-          const gift = giftItems.find((g) => g.id === item.gift_item_id);
-
-          return (
-            <div
-              key={item.id}
-              className={`relative p-4 border rounded shadow flex flex-col gap-2 transition
-                ${item.visible ? "bg-white" : "bg-gray-100 opacity-50"}
-              `}
-            >
-              {/* 정렬 버튼 상단 우측 배치 */}
-              <div className="absolute top-3 right-3 flex gap-2">
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  onClick={() => moveItem(category, index, "up")}
-                  disabled={index === 0}
-                >
-                  <ArrowUp size={16} />
-                </Button>
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  onClick={() => moveItem(category, index, "down")}
-                  disabled={index === filtered.length - 1}
-                >
-                  <ArrowDown size={16} />
-                </Button>
-              </div>
-
-              {gift?.image_url && (
-                <img
-                  src={gift.image_url}
-                  alt={gift.name}
-                  className="w-32 h-20 object-contain rounded self-start"
-                />
-              )}
-              <div className="text-base font-semibold">{gift?.name ?? "알 수 없음"}</div>
-
-              <div className="text-sm flex gap-4 items-center flex-wrap">
-                <label>
-                  <input
-                    type="checkbox"
-                    checked={item.visible}
-                    onChange={() =>
-                      handleFieldChange(item.id, "visible", !item.visible)
-                    }
-                  />
-                  사용자에게 보임
-                </label>
-                {item.category === "A" && (
-                  <label>
-                    <input
-                      type="checkbox"
-                      checked={item.allow_multiple}
-                      onChange={() =>
-                        handleFieldChange(item.id, "allow_multiple", !item.allow_multiple)
-                      }
-                    />
-                    중복 선택 허용
-                  </label>
-                )}
-
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  className="text-red-500 ml-auto"
-                  onClick={() => handleDelete(item.id)}
-                >
-                  <Trash2 size={16} />
-                </Button>
-              </div>
-            </div>
-          );
-        })}
-      </div>
+      <Droppable droppableId={category}>
+        {(provided) => (
+          <div
+            className="space-y-4"
+            ref={provided.innerRef}
+            {...provided.droppableProps}
+          >
+            {filtered.map((item, index) => {
+              const gift = giftItems.find((g) => g.id === item.gift_item_id);
+              return (
+                <Draggable key={item.id} draggableId={item.id} index={index}>
+                  {(prov) => (
+                    <div
+                      ref={prov.innerRef}
+                      {...prov.draggableProps}
+                      {...prov.dragHandleProps}
+                      className={`relative p-4 border rounded shadow flex flex-col gap-2 transition ${
+                        item.visible ? "bg-white" : "bg-gray-100 opacity-50"
+                      }`}
+                    >
+                      <div className="absolute top-3 right-3 text-gray-400 cursor-grab">⋮⋮</div>
+                      {gift?.image_url && (
+                        <img
+                          src={gift.image_url}
+                          alt={gift.name}
+                          className="w-32 h-20 object-contain rounded self-start"
+                        />
+                      )}
+                      <div className="text-base font-semibold">{gift?.name ?? "알 수 없음"}</div>
+                      <div className="text-sm flex gap-4 items-center flex-wrap">
+                        <label>
+                          <input
+                            type="checkbox"
+                            checked={item.visible}
+                            onChange={() =>
+                              handleFieldChange(item.id, "visible", !item.visible)
+                            }
+                          />
+                          사용자에게 보임
+                        </label>
+                        {item.category === "A" && (
+                          <label>
+                            <input
+                              type="checkbox"
+                              checked={item.allow_multiple}
+                              onChange={() =>
+                                handleFieldChange(
+                                  item.id,
+                                  "allow_multiple",
+                                  !item.allow_multiple
+                                )
+                              }
+                            />
+                            중복 선택 허용
+                          </label>
+                        )}
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className="text-red-500 ml-auto"
+                          onClick={() => handleDelete(item.id)}
+                        >
+                          <Trash2 size={16} />
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </Draggable>
+              );
+            })}
+            {provided.placeholder}
+          </div>
+        )}
+      </Droppable>
     );
   };
-
   return (
+    <DragDropContext onDragEnd={handleDragEnd}>
     <div>
       {/* 추가 폼 */}
       <div className="border p-4 rounded mb-6 space-y-3 bg-gray-50">
@@ -263,5 +280,6 @@ export default function AdminItems({ locationId }: Props) {
         </div>
       </div>
     </div>
+    </DragDropContext>
   );
 }
