@@ -95,11 +95,16 @@ export default function GlobalItemManager() {
       <div className="border rounded p-4 shadow bg-white space-y-3">
         <h3 className="font-semibold text-lg">기념품 항목 추가</h3>
 
-        <Input
-          placeholder="기념품 이름"
-          value={newItem.name ?? ""}
-          onChange={(e) => setNewItem((prev) => ({ ...prev, name: e.target.value }))}
-        />
+        <label className="block space-y-1">
+          <span className="sr-only">기념품 이름</span>
+          <Input
+            placeholder="기념품 이름"
+            value={newItem.name ?? ""}
+            onChange={(e) =>
+              setNewItem((prev) => ({ ...prev, name: e.target.value }))
+            }
+          />
+        </label>
 
         <Textarea
           placeholder="기념품 설명 (선택)"
@@ -189,13 +194,16 @@ export default function GlobalItemManager() {
         <Modal onClose={() => setShowEditModal(false)}>
           <h3 className="text-lg font-semibold mb-4">기념품 편집</h3>
 
-          <Input
-            value={editingItem.name}
-            onChange={(e) =>
-              setEditingItem({ ...editingItem, name: e.target.value })
-            }
-            placeholder="이름"
-          />
+          <label className="block space-y-1">
+            <span className="sr-only">이름</span>
+            <Input
+              value={editingItem.name}
+              onChange={(e) =>
+                setEditingItem({ ...editingItem, name: e.target.value })
+              }
+              placeholder="이름"
+            />
+          </label>
 
           <Textarea
             value={editingItem.description ?? ""}

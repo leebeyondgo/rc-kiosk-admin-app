@@ -40,20 +40,26 @@ export default function AdminLogin({ onBack, onLoginSuccess }: AdminLoginProps) 
     <div className="flex justify-center items-center h-full relative">
       <div className="w-full max-w-sm bg-white p-6 rounded-lg shadow space-y-4">
         <h1 className="text-xl font-semibold text-center">로그인</h1>
-        <Input
-          type="text"
-          placeholder="아이디"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          className="text-base"
-        />
-        <Input
-          type="password"
-          placeholder="비밀번호"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="text-base"
-        />
+        <label className="block space-y-1">
+          <span className="sr-only">아이디</span>
+          <Input
+            type="text"
+            placeholder="아이디"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            className="text-base"
+          />
+        </label>
+        <label className="block space-y-1">
+          <span className="sr-only">비밀번호</span>
+          <Input
+            type="password"
+            placeholder="비밀번호"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="text-base"
+          />
+        </label>
         <div className="flex justify-between">
           <Button onClick={onBack} variant="outline" className="text-base">
             돌아가기
