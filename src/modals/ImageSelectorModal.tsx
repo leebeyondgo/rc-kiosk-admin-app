@@ -72,7 +72,10 @@ export default function ImageSelectorModal({ onSelect, onClose }: Props) {
 
       <div className="grid grid-cols-3 gap-3 max-h-[400px] overflow-y-auto">
         {images.map((url) => (
-          <div key={url} className="relative group border rounded p-1">
+          <div
+            key={url}
+            className="relative group border rounded p-1 hover:ring-2 hover:ring-redCrossRed focus-within:ring-2"
+          >
             <img
               src={url}
               alt={url.split("/").pop()?.split("?")[0] || "image"}
@@ -91,7 +94,7 @@ export default function ImageSelectorModal({ onSelect, onClose }: Props) {
               }}
             />
             <button
-              className="absolute top-1 right-1 bg-white p-1 rounded-full shadow hidden group-hover:block focus:block group-focus-within:block"
+              className="absolute top-1 right-1 bg-white p-1 rounded-full shadow hidden group-hover:block group-focus:block"
               onClick={() => handleDelete(url)}
               onKeyDown={(e) => {
                 if (e.key === "Enter" || e.key === " ") {
