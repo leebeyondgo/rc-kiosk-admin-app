@@ -145,14 +145,14 @@ export default function AdminItems({ locationId }: Props) {
       .sort((a, b) => a.sort_order - b.sort_order);
 
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid [grid-template-columns:repeat(auto-fit,minmax(240px,1fr))] gap-4">
         {filtered.map((item, index) => {
           const gift = giftItems.find((g) => g.id === item.gift_item_id);
 
           return (
             <div
               key={item.id}
-              className={`relative p-4 border rounded shadow flex flex-col gap-2 transition min-w-[250px]
+              className={`relative p-4 border rounded shadow flex flex-col gap-2 transition w-full
                 ${item.visible ? "bg-white" : "bg-redCrossWarmGray-100 opacity-50"}
               `}
             >
@@ -183,7 +183,7 @@ export default function AdminItems({ locationId }: Props) {
                 <img
                   src={gift.image_url}
                   alt={gift.name}
-                  className="w-32 h-20 object-contain rounded self-start"
+                  className="w-24 h-16 object-contain rounded self-start"
                 />
               )}
               <div className="text-base font-semibold">{gift?.name ?? "알 수 없음"}</div>
