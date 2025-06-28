@@ -1,4 +1,3 @@
-import colors from "tailwindcss/colors";
 
 export default {
   content: [
@@ -9,7 +8,30 @@ export default {
     extend: {
       colors: {
         redCrossRed: '#d62828',
-        redCrossWarmGray: '#9b8f8b',
+        redCrossWarmGray: {
+          50: '#f5f5f4',
+          100: '#e7e5e4',
+          200: '#d6d3d1',
+          300: '#a8a29e',
+          400: '#78716c',
+          500: '#57534e',
+          600: '#44403c',
+          700: '#292524',
+          800: '#1c1917',
+          900: '#0c0a09'
+        },
+        warmGray: {
+          50: '#f5f5f4',
+          100: '#e7e5e4',
+          200: '#d6d3d1',
+          300: '#a8a29e',
+          400: '#78716c',
+          500: '#57534e',
+          600: '#44403c',
+          700: '#292524',
+          800: '#1c1917',
+          900: '#0c0a09'
+        },
         redCrossGray: '#8c8c8c',
         redCrossGold: '#d4af37',
         redCrossSilver: '#c0c0c0',

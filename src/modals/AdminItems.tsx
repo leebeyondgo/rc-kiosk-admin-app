@@ -153,7 +153,7 @@ export default function AdminItems({ locationId }: Props) {
             <div
               key={item.id}
               className={`relative p-4 border rounded shadow flex flex-col gap-2 transition
-                ${item.visible ? "bg-white" : "bg-warmGray-100 opacity-50"}
+                ${item.visible ? "bg-white" : "bg-redCrossWarmGray-100 opacity-50"}
               `}
             >
               {/* 정렬 버튼 상단 우측 배치 */}
@@ -231,7 +231,7 @@ export default function AdminItems({ locationId }: Props) {
   return (
     <div>
       {/* 추가 폼 */}
-      <div className="border p-4 rounded mb-6 space-y-3 bg-warmGray-50">
+      <div className="border p-4 rounded mb-6 space-y-3 bg-redCrossWarmGray-50">
         <h3 className="font-semibold text-lg">기념품 추가</h3>
         <select
           value={newGiftItemId}
