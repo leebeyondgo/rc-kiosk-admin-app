@@ -113,10 +113,16 @@ export default function GlobalItemManager() {
           />
         </label>
 
+        <label htmlFor="new-item-desc" className="sr-only">
+          기념품 설명
+        </label>
         <Textarea
+          id="new-item-desc"
           placeholder="기념품 설명 (선택)"
           value={newItem.description ?? ""}
-          onChange={(e) => setNewItem((prev) => ({ ...prev, description: e.target.value }))}
+          onChange={(e) =>
+            setNewItem((prev) => ({ ...prev, description: e.target.value }))
+          }
         />
 
         <div className="space-y-2">
@@ -147,12 +153,16 @@ export default function GlobalItemManager() {
       {/* 📋 현재 항목 목록 */}
       <div>
         <h3 className="font-semibold mb-3">기존 기념품 목록 ({items.length})</h3>
-        <Input
-          placeholder="검색"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="mb-3"
-        />
+        <label htmlFor="item-search" className="sr-only">
+          검색
+          <Input
+            id="item-search"
+            placeholder="검색"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="mb-3"
+          />
+        </label>
         <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredItems.map((item) => (
             <li
@@ -233,7 +243,11 @@ export default function GlobalItemManager() {
             />
           </label>
 
+          <label htmlFor="edit-item-desc" className="sr-only">
+            설명
+          </label>
           <Textarea
+            id="edit-item-desc"
             value={editingItem.description ?? ""}
             onChange={(e) =>
               setEditingItem({ ...editingItem, description: e.target.value })
