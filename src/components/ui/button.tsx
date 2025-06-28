@@ -35,7 +35,6 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         "border border-redCrossWarmGray text-black hover:bg-redCrossWarmGray-50 focus:ring-redCrossWarmGray",
       destructive: "bg-redCrossRed text-white hover:bg-redCrossRed/80"
     };
-
     return (
       <button
         ref={ref}
