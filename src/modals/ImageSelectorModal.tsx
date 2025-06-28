@@ -69,6 +69,9 @@ export default function ImageSelectorModal({ onSelect, onClose }: Props) {
       <h2 className="text-lg font-semibold mb-4">이미지 선택</h2>
 
       <div className="grid grid-cols-3 gap-3 max-h-[400px] overflow-y-auto">
+        {images.length === 0 && (
+          <p className="text-center text-redCrossWarmGray-400">이미지가 없습니다.</p>
+        )}
         {images.map((url) => (
           <div key={url} className="relative group border rounded p-1">
             <img
