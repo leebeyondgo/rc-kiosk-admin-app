@@ -1,6 +1,10 @@
 import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 
+// 전역 모달 개수 카운터와 body overflow 보존 변수
+let openModals = 0;
+let originalBodyOverflow = "";
+
 interface Props {
   children: React.ReactNode;
   onClose: () => void;
@@ -11,8 +15,12 @@ export default function Modal({ children, onClose, labelledBy }: Props) {
   const modalRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const originalOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
+    // 모달이 처음 열릴 때 body overflow 상태를 보존하고 숨김 처리
+    if (openModals === 0) {
+      originalBodyOverflow = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+    }
+    openModals++;
 
     const previouslyFocused = document.activeElement as HTMLElement | null;
     const selector =
@@ -57,7 +65,11 @@ export default function Modal({ children, onClose, labelledBy }: Props) {
 
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
-      document.body.style.overflow = originalOverflow;
+      openModals--;
+      // 모든 모달이 닫혔을 때만 overflow 복원
+      if (openModals === 0) {
+        document.body.style.overflow = originalBodyOverflow;
+      }
       previouslyFocused?.focus();
     };
   }, [onClose]);
