@@ -39,7 +39,11 @@ export default function KioskLinks() {
   return (
     <div className="max-w-6xl mx-auto p-6">
       <div className="mb-4">
+        <label htmlFor="location-search" className="sr-only">
+          검색
+        </label>
         <Input
+          id="location-search"
           placeholder="장소 검색"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
