@@ -257,7 +257,7 @@ export default function AdminItems({ locationId }: Props) {
       </div>
 
       {/* 항목 목록 */}
-      <div className="space-y-8 mt-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-4">
         <div>
           <h2 className="text-lg font-semibold mb-2">A 품목</h2>
           {renderCategory("A")}
