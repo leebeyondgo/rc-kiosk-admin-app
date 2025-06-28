@@ -75,16 +75,30 @@ export default function ImageSelectorModal({ onSelect, onClose }: Props) {
           <div key={url} className="relative group border rounded p-1">
             <img
               src={url}
-              alt="img"
+              alt={url.split("/").pop()?.split("?")[0] || "image"}
               className="w-full aspect-square object-contain rounded cursor-pointer"
+              tabIndex={0}
               onClick={() => {
                 onSelect(url);
                 onClose();
               }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  onSelect(url);
+                  onClose();
+                }
+              }}
             />
             <button
-              className="absolute top-1 right-1 bg-white p-1 rounded-full shadow hidden group-hover:block"
+              className="absolute top-1 right-1 bg-white p-1 rounded-full shadow hidden group-hover:block focus:block group-focus-within:block"
               onClick={() => handleDelete(url)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  handleDelete(url);
+                }
+              }}
               aria-label="이미지 삭제"
             >
               <Trash2 size={14} className="text-redCrossRed" />
