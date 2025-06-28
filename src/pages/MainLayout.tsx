@@ -151,7 +151,7 @@ export default function MainLayout() {
             <h2 className="text-lg font-bold">메뉴</h2>
             <button
               onClick={() => setSidebarOpen(false)}
-              className="text-warmGray-500 hover:text-black"
+              className="text-redCrossWarmGray-500 hover:text-black"
               aria-label="메뉴 닫기"
             >
               &times;

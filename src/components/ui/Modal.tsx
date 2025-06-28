@@ -74,7 +74,7 @@ export default function Modal({ children, onClose }: Props) {
         {/* 상단 우측 닫기 버튼 */}
         <button
           onClick={onClose}
-          className="absolute top-3 right-3 text-warmGray-400 hover:text-black text-2xl font-bold w-10 h-10 flex items-center justify-center rounded-full hover:bg-warmGray-200 transition"
+          className="absolute top-3 right-3 text-redCrossWarmGray-400 hover:text-black text-2xl font-bold w-10 h-10 flex items-center justify-center rounded-full hover:bg-redCrossWarmGray-200 transition"
           aria-label="닫기"
         >
           ✕

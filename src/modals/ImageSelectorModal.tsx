@@ -92,7 +92,7 @@ export default function ImageSelectorModal({ onSelect, onClose }: Props) {
       </div>
 
       <div className="mt-4">
-        <label className="flex items-center gap-2 text-sm text-warmGray-600">
+        <label className="flex items-center gap-2 text-sm text-redCrossWarmGray-600">
           <Upload size={16} />
           이미지 업로드:
           <input type="file" onChange={handleUpload} disabled={uploading} />
