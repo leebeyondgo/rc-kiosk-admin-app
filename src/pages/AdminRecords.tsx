@@ -244,9 +244,11 @@ export default function AdminRecords() {
         <div className="space-y-2">
           <div className="flex items-center gap-4">
             <label className="font-semibold">날짜 선택</label>
-            <label className="flex items-center gap-1">
+            <div className="flex items-center gap-1">
               <input
                 type="radio"
+                name="date-mode"
+                id="date-mode-today"
                 value="today"
                 checked={dateMode === 'today'}
                 onChange={() => {
@@ -255,17 +257,19 @@ export default function AdminRecords() {
                   setEndDate(today);
                 }}
               />
-              오늘
-            </label>
-            <label className="flex items-center gap-1">
+              <label htmlFor="date-mode-today">오늘</label>
+            </div>
+            <div className="flex items-center gap-1">
               <input
                 type="radio"
+                name="date-mode"
+                id="date-mode-range"
                 value="range"
                 checked={dateMode === 'range'}
                 onChange={() => setDateMode('range')}
               />
-              기간
-            </label>
+              <label htmlFor="date-mode-range">기간</label>
+            </div>
           </div>
           {dateMode === 'range' && (
             <div className="flex gap-4">
@@ -293,9 +297,11 @@ export default function AdminRecords() {
             {showLocationDropdown && (
               <div className="absolute z-10 mt-2 w-full max-h-40 overflow-y-auto border rounded bg-white shadow">
                 {locations.map((loc) => (
-                  <label key={loc.id} className="flex items-center gap-2 p-2">
+                  <div key={loc.id} className="flex items-center gap-2 p-2">
                     <input
                       type="checkbox"
+                      name="location-filter"
+                      id={`location-${loc.id}`}
                       checked={selectedLocations.includes(loc.id)}
                       onChange={() =>
                         setSelectedLocations((prev) =>
@@ -305,8 +311,8 @@ export default function AdminRecords() {
                         )
                       }
                     />
-                    {loc.name}
-                  </label>
+                    <label htmlFor={`location-${loc.id}`}>{loc.name}</label>
+                  </div>
                 ))}
               </div>
             )}
@@ -321,33 +327,39 @@ export default function AdminRecords() {
         <div className="space-y-2">
           <label className="font-semibold">지급 상태</label>
           <div className="flex items-center gap-4">
-            <label className="flex items-center gap-1">
+            <div className="flex items-center gap-1">
               <input
                 type="radio"
+                name="ack-filter"
+                id="ack-all"
                 value="all"
                 checked={ackFilter === "all"}
                 onChange={() => setAckFilter("all")}
               />
-              전체
-            </label>
-            <label className="flex items-center gap-1">
+              <label htmlFor="ack-all">전체</label>
+            </div>
+            <div className="flex items-center gap-1">
               <input
                 type="radio"
+                name="ack-filter"
+                id="ack-paid"
                 value="paid"
                 checked={ackFilter === "paid"}
                 onChange={() => setAckFilter("paid")}
               />
-              지급함
-            </label>
-            <label className="flex items-center gap-1">
+              <label htmlFor="ack-paid">지급함</label>
+            </div>
+            <div className="flex items-center gap-1">
               <input
                 type="radio"
+                name="ack-filter"
+                id="ack-unpaid"
                 value="unpaid"
                 checked={ackFilter === "unpaid"}
                 onChange={() => setAckFilter("unpaid")}
               />
-              미지급
-            </label>
+              <label htmlFor="ack-unpaid">미지급</label>
+            </div>
           </div>
         </div>
         {/* 컨트롤 버튼 */}
@@ -366,8 +378,10 @@ export default function AdminRecords() {
 
         {/* 선택 및 항목 수 */}
         <div className="flex justify-between items-center text-sm text-redCrossWarmGray-500">
-          <label className="flex items-center gap-2">
+          <label htmlFor="select-all" className="flex items-center gap-2">
             <input
+              id="select-all"
+              name="select-all"
               type="checkbox"
               checked={selectedRecords.size === filteredRecords.length && filteredRecords.length > 0}
               onChange={toggleSelectAll}
@@ -419,6 +433,8 @@ export default function AdminRecords() {
                   {/* 체크박스를 클릭할 때만 "확인함" 상태가 변경되지 않도록 stopPropagation() */}
                   <input
                     type="checkbox"
+                    name="record-select"
+                    id={`record-${record.id}`}
                     checked={selectedRecords.has(record.id)}
                     onChange={(e) => {
                       e.stopPropagation(); // 체크박스를 클릭할 때 "확인함" 상태 변경 안됨

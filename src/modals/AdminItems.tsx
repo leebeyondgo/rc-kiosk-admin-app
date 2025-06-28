@@ -190,6 +190,7 @@ export default function AdminItems({ locationId }: Props) {
                 <label className="inline-flex items-center gap-1 whitespace-nowrap">
                   <input
                     type="checkbox"
+                    name="visible"
                     checked={item.visible}
                     onChange={() =>
                       handleFieldChange(item.id, "visible", !item.visible)
@@ -201,6 +202,7 @@ export default function AdminItems({ locationId }: Props) {
                   <label className="inline-flex items-center gap-1 whitespace-nowrap">
                     <input
                       type="checkbox"
+                      name="allow-multiple"
                       checked={item.allow_multiple}
                       onChange={() =>
                         handleFieldChange(item.id, "allow_multiple", !item.allow_multiple)

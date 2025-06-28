@@ -141,9 +141,11 @@ export default function BulkItemManager() {
                   {locations
                     .filter((l) => l.id !== syncSourceId)
                     .map((loc) => (
-                      <label key={loc.id} className="flex items-center gap-2">
+                      <div key={loc.id} className="flex items-center gap-2">
                         <input
                           type="checkbox"
+                          name="sync-targets"
+                          id={`sync-${loc.id}`}
                           checked={syncTargetIds.includes(loc.id)}
                           onChange={() =>
                             setSyncTargetIds((prev) =>
@@ -153,8 +155,8 @@ export default function BulkItemManager() {
                             )
                           }
                         />
-                        {loc.name}
-                      </label>
+                        <label htmlFor={`sync-${loc.id}`}>{loc.name}</label>
+                      </div>
                     ))}
                 </div>
               </div>
