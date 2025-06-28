@@ -40,7 +40,7 @@ export default function StatisticsModal({ data }: Props) {
                 <XAxis dataKey="name" />
                 <YAxis allowDecimals={false} />
                 <Tooltip />
-                <Bar dataKey="count" fill="#d62828" />
+                <Bar dataKey="count" fill="theme('colors.redCrossRed')" />
               </BarChart>
             </ResponsiveContainer>
           </div>
