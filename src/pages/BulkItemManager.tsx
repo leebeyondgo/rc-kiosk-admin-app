@@ -179,8 +179,11 @@ export default function BulkItemManager() {
           )}
 
           {showModal && selectedLocation && (
-            <Modal onClose={() => setShowModal(false)}>
-              <h3 className="text-lg font-semibold mb-3">
+            <Modal
+              onClose={() => setShowModal(false)}
+              labelledBy="location-modal-title"
+            >
+              <h3 id="location-modal-title" className="text-lg font-semibold mb-3">
                 {selectedLocation.name}의 기념품 관리
               </h3>
               <AdminItems locationId={selectedLocation.id} />

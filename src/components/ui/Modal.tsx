@@ -4,9 +4,10 @@ import { createPortal } from "react-dom";
 interface Props {
   children: React.ReactNode;
   onClose: () => void;
+  labelledBy?: string;
 }
 
-export default function Modal({ children, onClose }: Props) {
+export default function Modal({ children, onClose, labelledBy }: Props) {
   const modalRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -63,6 +64,9 @@ export default function Modal({ children, onClose }: Props) {
 
   return createPortal(
     <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby={labelledBy}
       className="fixed inset-0 z-50 bg-black bg-opacity-50 flex justify-center items-start overflow-y-auto"
       onClick={onClose}
     >
