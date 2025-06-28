@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
+import { X } from "lucide-react";
 
 // 전역 모달 개수 카운터와 body overflow 보존 변수
 let openModals = 0;
@@ -93,7 +94,7 @@ export default function Modal({ children, onClose, labelledBy }: Props) {
           className="absolute top-3 right-3 text-redCrossWarmGray-400 hover:text-black text-2xl font-bold w-10 h-10 flex items-center justify-center rounded-full hover:bg-redCrossWarmGray-200 transition"
           aria-label="닫기"
         >
-          ✕
+          <X size={20} />
         </button>
 
         {/* 컨텐츠 */}
