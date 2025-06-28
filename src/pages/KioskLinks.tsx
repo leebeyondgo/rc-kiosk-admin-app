@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from "@/lib/supabaseConfig";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import QRCode from "qrcode.react";
 import { Download } from "lucide-react";
 
@@ -14,6 +15,7 @@ interface Location {
 
 export default function KioskLinks() {
   const [locations, setLocations] = useState<Location[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     const fetchLocations = async () => {
@@ -38,8 +40,19 @@ export default function KioskLinks() {
 
   return (
     <div className="max-w-6xl mx-auto p-6">
+      <div className="mb-4">
+        <Input
+          placeholder="장소 검색"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+      </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {locations.map((loc) => (
+        {locations
+          .filter((loc) =>
+            loc.name.toLowerCase().includes(searchTerm.toLowerCase())
+          )
+          .map((loc) => (
           <div
             key={loc.id}
             className="p-4 border rounded shadow bg-white flex flex-col items-center justify-between"
