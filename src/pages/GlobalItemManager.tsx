@@ -216,6 +216,7 @@ export default function GlobalItemManager() {
         <Modal
           onClose={() => setShowEditModal(false)}
           labelledBy="edit-item-modal-title"
+          maxWidthClass="max-w-[95vw] sm:max-w-xl md:max-w-3xl"
         >
           <h3 id="edit-item-modal-title" className="text-lg font-semibold mb-4">
             기념품 편집

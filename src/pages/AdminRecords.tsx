@@ -475,6 +475,7 @@ export default function AdminRecords() {
         <Modal
           onClose={() => setShowModal(false)}
           labelledBy="statistics-modal-title"
+          maxWidthClass="max-w-[95vw] sm:max-w-xl md:max-w-5xl"
         >
           <StatisticsModal
             data={filteredRecords}

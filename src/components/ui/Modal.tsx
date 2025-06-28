@@ -10,9 +10,16 @@ interface Props {
   children: React.ReactNode;
   onClose: () => void;
   labelledBy?: string;
+  /** 최대 너비에 적용할 tailwind 클래스 */
+  maxWidthClass?: string;
 }
 
-export default function Modal({ children, onClose, labelledBy }: Props) {
+export default function Modal({
+  children,
+  onClose,
+  labelledBy,
+  maxWidthClass = "max-w-[95vw] sm:max-w-xl md:max-w-4xl",
+}: Props) {
   const modalRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -85,7 +92,7 @@ export default function Modal({ children, onClose, labelledBy }: Props) {
     >
       <div
         ref={modalRef}
-        className="w-full max-w-3xl rounded-lg bg-white shadow-lg relative p-6 my-10" // 상단 마진만 고정
+        className={`w-full ${maxWidthClass} rounded-lg bg-white shadow-lg relative p-6 my-10`} // 상단 마진만 고정
         onClick={(e) => e.stopPropagation()}
       >
         {/* 상단 우측 닫기 버튼 */}

@@ -66,7 +66,11 @@ export default function ImageSelectorModal({ onSelect, onClose }: Props) {
   };
 
   return (
-    <Modal onClose={onClose} labelledBy="image-selector-title">
+    <Modal
+      onClose={onClose}
+      labelledBy="image-selector-title"
+      maxWidthClass="max-w-[95vw] sm:max-w-3xl md:max-w-5xl"
+    >
       <h2 id="image-selector-title" className="text-lg font-semibold mb-4">
         이미지 선택
       </h2>

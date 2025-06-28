@@ -182,6 +182,7 @@ export default function BulkItemManager() {
             <Modal
               onClose={() => setShowModal(false)}
               labelledBy="location-modal-title"
+              maxWidthClass="max-w-[95vw] sm:max-w-2xl md:max-w-5xl"
             >
               <h3 id="location-modal-title" className="text-lg font-semibold mb-3">
                 {selectedLocation.name}의 기념품 관리
