@@ -1,12 +1,10 @@
 import { useEffect, useState } from "react";
-import { createClient } from "@supabase/supabase-js";
-import { SUPABASE_URL, SUPABASE_ANON_KEY } from "@/lib/supabaseConfig";
+import supabase from "@/lib/supabaseClient";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import QRCode from "qrcode.react";
 import { Download } from "lucide-react";
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 interface Location {
   id: string;

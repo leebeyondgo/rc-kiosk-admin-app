@@ -1,12 +1,10 @@
 import { useEffect, useState, useRef } from "react";
-import { createClient } from "@supabase/supabase-js";
-import { SUPABASE_URL, SUPABASE_ANON_KEY } from "@/lib/supabaseConfig";
+import supabase from "@/lib/supabaseClient";
 import { Button } from "@/components/ui/button";
 import Modal from "@/components/ui/Modal";
 import { Trash2, Upload } from "lucide-react";
 import { useToast } from "@/components/ui/Toast";
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 interface Props {
   onSelect: (url: string) => void;

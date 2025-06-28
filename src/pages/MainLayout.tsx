@@ -14,10 +14,8 @@ import AdminRecords from "./AdminRecords";
 import AdminLogin from "./AdminLogin";
 import BulkItemManager from "./BulkItemManager";
 import KioskLinks from "./KioskLinks";
-import { createClient } from "@supabase/supabase-js";
-import { SUPABASE_URL, SUPABASE_ANON_KEY } from "@/lib/supabaseConfig";
+import supabase from "@/lib/supabaseClient";
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 export default function MainLayout() {
   const navigate = useNavigate();

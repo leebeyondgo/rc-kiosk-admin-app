@@ -1,11 +1,9 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowUp, ArrowDown, Trash2 } from "lucide-react";
-import { createClient } from "@supabase/supabase-js";
-import { SUPABASE_URL, SUPABASE_ANON_KEY } from "@/lib/supabaseConfig";
+import supabase from "@/lib/supabaseClient";
 import { useToast } from "@/components/ui/Toast";
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 interface GiftItem {
   id: string;

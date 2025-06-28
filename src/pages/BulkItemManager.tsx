@@ -1,13 +1,11 @@
 import { useEffect, useState } from "react";
-import { createClient } from "@supabase/supabase-js";
-import { SUPABASE_URL, SUPABASE_ANON_KEY } from "@/lib/supabaseConfig";
+import supabase from "@/lib/supabaseClient";
 import { Button } from "@/components/ui/button";
 import Modal from "@/components/ui/Modal";
 import AdminItems from "@/modals/AdminItems";
 import GlobalItemManager from "@/pages/GlobalItemManager";
 import { useToast } from "@/components/ui/Toast";
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 interface Location {
   id: string;
