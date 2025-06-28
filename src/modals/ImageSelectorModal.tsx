@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { createClient } from "@supabase/supabase-js";
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from "@/lib/supabaseConfig";
 import { Button } from "@/components/ui/button";
@@ -16,6 +16,7 @@ interface Props {
 export default function ImageSelectorModal({ onSelect, onClose }: Props) {
   const [images, setImages] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const toast = useToast();
 
   const fetchImages = async () => {
@@ -110,12 +111,24 @@ export default function ImageSelectorModal({ onSelect, onClose }: Props) {
         ))}
       </div>
 
-      <div className="mt-4">
-        <label className="flex items-center gap-2 text-sm text-redCrossWarmGray-600">
+      <div className="mt-4 flex items-center gap-2">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => fileInputRef.current?.click()}
+          disabled={uploading}
+          className="flex items-center gap-1"
+        >
           <Upload size={16} />
-          이미지 업로드:
-          <input type="file" onChange={handleUpload} disabled={uploading} />
-        </label>
+          이미지 업로드
+        </Button>
+        <input
+          ref={fileInputRef}
+          type="file"
+          onChange={handleUpload}
+          disabled={uploading}
+          className="sr-only"
+        />
       </div>
     </Modal>
   );
