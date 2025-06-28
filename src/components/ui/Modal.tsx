@@ -79,12 +79,12 @@ export default function Modal({ children, onClose, labelledBy }: Props) {
       role="dialog"
       aria-modal="true"
       aria-labelledby={labelledBy}
-      className="fixed inset-0 z-50 bg-black bg-opacity-50 flex justify-center items-start overflow-y-auto"
+      className="fixed inset-0 z-50 bg-black bg-opacity-50 flex justify-center items-center overflow-y-auto"
       onClick={onClose}
     >
       <div
         ref={modalRef}
-        className="w-full max-w-3xl rounded-lg bg-white shadow-lg relative p-6 mt-10 mb-10" // 상단 마진만 고정
+        className="w-full max-w-3xl rounded-lg bg-white shadow-lg relative p-6 my-10" // 상단 마진만 고정
         onClick={(e) => e.stopPropagation()}
       >
         {/* 상단 우측 닫기 버튼 */}
