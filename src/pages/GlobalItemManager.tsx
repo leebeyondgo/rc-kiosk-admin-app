@@ -178,7 +178,7 @@ export default function GlobalItemManager() {
                 <Button
                   variant="ghost"
                   onClick={() => handleDelete(item.id)}
-                  className="text-redCrossRed-500"
+                  className="text-redCrossRed"
                   aria-label="삭제"
                 >
                   <Trash2 size={16} />

@@ -214,7 +214,7 @@ export default function AdminItems({ locationId }: Props) {
                 <Button
                   size="icon"
                   variant="ghost"
-                  className="text-redCrossRed-500 ml-auto"
+                  className="text-redCrossRed ml-auto"
                   onClick={() => handleDelete(item.id)}
                   aria-label="항목 삭제"
                 >

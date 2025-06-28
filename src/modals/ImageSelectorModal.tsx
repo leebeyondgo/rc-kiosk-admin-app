@@ -85,7 +85,7 @@ export default function ImageSelectorModal({ onSelect, onClose }: Props) {
               onClick={() => handleDelete(url)}
               aria-label="이미지 삭제"
             >
-              <Trash2 size={14} className="text-redCrossRed-500" />
+              <Trash2 size={14} className="text-redCrossRed" />
             </button>
           </div>
         ))}

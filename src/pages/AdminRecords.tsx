@@ -434,7 +434,7 @@ export default function AdminRecords() {
                     e.stopPropagation();
                     handleDelete(record.id);
                   }}
-                  className="absolute top-3 right-3 text-warmGray-400 hover:text-redCrossRed-500"
+                  className="absolute top-3 right-3 text-warmGray-400 hover:text-redCrossRed"
                   aria-label="기록 삭제"
                 >
                   <Trash2 size={16} />
