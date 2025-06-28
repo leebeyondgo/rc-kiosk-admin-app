@@ -42,20 +42,22 @@ export default function AdminLogin({ onBack, onLoginSuccess }: AdminLoginProps) 
     <div className="flex justify-center items-center h-full relative">
       <div className="w-full max-w-sm bg-white p-6 rounded-lg shadow space-y-4">
         <h1 className="text-xl font-semibold text-center">로그인</h1>
-        <label className="block space-y-1">
+        <label className="block space-y-1" htmlFor="username">
           <span className="sr-only">아이디</span>
           <Input
             type="text"
+            id="username"
             placeholder="아이디"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             className="text-base"
           />
         </label>
-        <label className="block space-y-1">
+        <label className="block space-y-1" htmlFor="password">
           <span className="sr-only">비밀번호</span>
           <Input
             type="password"
+            id="password"
             placeholder="비밀번호"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
