@@ -1,18 +1,6 @@
 {
   "name": "기념품 키오스크 관리",
   "short_name": "키오스크 관리",
-  "icons": [
-    {
-      "src": "/rc-kiosk-admin-app/android-chrome-192x192.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "/rc-kiosk-admin-app/android-chrome-512x512.png",
-      "sizes": "512x512",
-      "type": "image/png"
-    }
-  ],
   "start_url": "/rc-kiosk-admin-app/",
   "display": "standalone",
   "theme_color": "#ffffff",
