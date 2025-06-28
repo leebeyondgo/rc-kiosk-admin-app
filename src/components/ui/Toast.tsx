@@ -31,7 +31,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
           <div
             key={t.id}
             className={cn(
-              "bg-gray-900 text-white px-4 py-2 rounded shadow-md transition-opacity"
+              "bg-warmGray-900 text-white px-4 py-2 rounded shadow-md transition-opacity"
             )}
           >
             {t.message}
