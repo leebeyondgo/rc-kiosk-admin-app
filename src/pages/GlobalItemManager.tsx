@@ -101,9 +101,10 @@ export default function GlobalItemManager() {
       <div className="border rounded p-4 shadow bg-white space-y-3">
         <h3 className="font-semibold text-lg">기념품 항목 추가</h3>
 
-        <label className="block space-y-1">
+        <label className="block space-y-1" htmlFor="new-item-name">
           <span className="sr-only">기념품 이름</span>
           <Input
+            id="new-item-name"
             placeholder="기념품 이름"
             value={newItem.name ?? ""}
             onChange={(e) =>
@@ -220,9 +221,10 @@ export default function GlobalItemManager() {
             기념품 편집
           </h3>
 
-          <label className="block space-y-1">
+          <label className="block space-y-1" htmlFor="edit-item-name">
             <span className="sr-only">이름</span>
             <Input
+              id="edit-item-name"
               value={editingItem.name}
               onChange={(e) =>
                 setEditingItem({ ...editingItem, name: e.target.value })
