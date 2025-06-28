@@ -33,7 +33,10 @@ export default {
           900: '#0c0a09'
         },
         redCrossGray: '#8c8c8c',
-        redCrossGold: '#d4af37',
+        redCrossGold: {
+          DEFAULT: '#d4af37',
+          light: '#fbe8b0',
+        },
         redCrossSilver: '#c0c0c0',
       },
       fontSize: {
@@ -48,8 +51,8 @@ export default {
       },
       keyframes: {
         highlight: {
-          '0%, 100%': { backgroundColor: '#f9e5a7' },
-          '50%': { backgroundColor: '#c79e2e' },
+          '0%, 100%': { backgroundColor: '#fbe8b0' },
+          '50%': { backgroundColor: '#d4af37' },
         },
       },
       animation: {
