@@ -26,6 +26,7 @@ export default function GlobalItemManager() {
   const [showImageModal, setShowImageModal] = useState(false);
   const [editingItem, setEditingItem] = useState<GiftItem | null>(null);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
   const toast = useToast();
 
   const fetchItems = async () => {
@@ -92,6 +93,10 @@ export default function GlobalItemManager() {
     }
   };
 
+  const filteredItems = items.filter((i) =>
+    i.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <div className="space-y-8">
       {/* ➕ 새 기념품 추가 */}
@@ -143,8 +148,14 @@ export default function GlobalItemManager() {
       {/* 📋 현재 항목 목록 */}
       <div>
         <h3 className="font-semibold mb-3">기존 기념품 목록 ({items.length})</h3>
+        <Input
+          placeholder="검색"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="mb-3"
+        />
         <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {items.map((item) => (
+          {filteredItems.map((item) => (
             <li
               key={item.id}
               className="flex items-center justify-between border rounded px-4 py-2 bg-white shadow-sm w-full"
