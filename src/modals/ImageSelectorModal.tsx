@@ -65,24 +65,40 @@ export default function ImageSelectorModal({ onSelect, onClose }: Props) {
   };
 
   return (
-    <Modal onClose={onClose}>
-      <h2 className="text-lg font-semibold mb-4">이미지 선택</h2>
+    <Modal onClose={onClose} labelledBy="image-selector-title">
+      <h2 id="image-selector-title" className="text-lg font-semibold mb-4">
+        이미지 선택
+      </h2>
 
       <div className="grid grid-cols-3 gap-3 max-h-[400px] overflow-y-auto">
         {images.map((url) => (
           <div key={url} className="relative group border rounded p-1">
             <img
               src={url}
-              alt="img"
+              alt={url.split("/").pop()?.split("?")[0] || "image"}
               className="w-full aspect-square object-contain rounded cursor-pointer"
+              tabIndex={0}
               onClick={() => {
                 onSelect(url);
                 onClose();
               }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  onSelect(url);
+                  onClose();
+                }
+              }}
             />
             <button
-              className="absolute top-1 right-1 bg-white p-1 rounded-full shadow hidden group-hover:block"
+              className="absolute top-1 right-1 bg-white p-1 rounded-full shadow hidden group-hover:block focus:block group-focus-within:block"
               onClick={() => handleDelete(url)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  handleDelete(url);
+                }
+              }}
               aria-label="이미지 삭제"
             >
               <Trash2 size={14} className="text-redCrossRed" />

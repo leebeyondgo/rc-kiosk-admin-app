@@ -202,8 +202,13 @@ export default function GlobalItemManager() {
 
       {/* 수정용 모달 */}
       {showEditModal && editingItem && (
-        <Modal onClose={() => setShowEditModal(false)}>
-          <h3 className="text-lg font-semibold mb-4">기념품 편집</h3>
+        <Modal
+          onClose={() => setShowEditModal(false)}
+          labelledBy="edit-item-modal-title"
+        >
+          <h3 id="edit-item-modal-title" className="text-lg font-semibold mb-4">
+            기념품 편집
+          </h3>
 
           <label className="block space-y-1">
             <span className="sr-only">이름</span>

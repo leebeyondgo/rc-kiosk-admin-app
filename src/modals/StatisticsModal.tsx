@@ -10,9 +10,10 @@ import { GiftRecord } from "@/types";
 
 interface Props {
   data: GiftRecord[];
+  titleId?: string;
 }
 
-export default function StatisticsModal({ data }: Props) {
+export default function StatisticsModal({ data, titleId }: Props) {
   const itemCount: Record<string, number> = {};
 
   data.forEach((record) => {
@@ -27,7 +28,9 @@ export default function StatisticsModal({ data }: Props) {
 
   return (
     <div>
-      <h1 className="text-lg font-bold mb-4">기념품 통계</h1>
+      <h1 id={titleId} className="text-lg font-bold mb-4">
+        기념품 통계
+      </h1>
 
       {chartData.length === 0 ? (
         <p className="text-center text-redCrossWarmGray-400">데이터가 없습니다.</p>

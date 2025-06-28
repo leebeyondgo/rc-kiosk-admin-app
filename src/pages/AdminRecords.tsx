@@ -472,8 +472,14 @@ export default function AdminRecords() {
       </>
       )}
       {showModal && (
-        <Modal onClose={() => setShowModal(false)}>
-          <StatisticsModal data={filteredRecords} />
+        <Modal
+          onClose={() => setShowModal(false)}
+          labelledBy="statistics-modal-title"
+        >
+          <StatisticsModal
+            data={filteredRecords}
+            titleId="statistics-modal-title"
+          />
         </Modal>
       )}
     </div>
