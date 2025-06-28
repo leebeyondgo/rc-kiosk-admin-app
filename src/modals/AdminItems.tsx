@@ -152,10 +152,11 @@ export default function AdminItems({ locationId }: Props) {
           return (
             <div
               key={item.id}
-              className={`relative p-4 border rounded shadow flex flex-col gap-2 transition
+              className={`relative p-4 border rounded shadow flex flex-col gap-2 transition min-w-[250px]
                 ${item.visible ? "bg-white" : "bg-redCrossWarmGray-100 opacity-50"}
               `}
             >
+              <span className="absolute top-3 left-3 text-xs font-semibold">{item.sort_order}</span>
               {/* 정렬 버튼 상단 우측 배치 */}
               <div className="absolute top-3 right-3 flex gap-2">
                 <Button
@@ -188,7 +189,7 @@ export default function AdminItems({ locationId }: Props) {
               <div className="text-base font-semibold">{gift?.name ?? "알 수 없음"}</div>
 
               <div className="text-sm flex gap-4 items-center flex-wrap">
-                <label>
+                <label className="inline-flex items-center gap-1 whitespace-nowrap">
                   <input
                     type="checkbox"
                     checked={item.visible}
@@ -199,7 +200,7 @@ export default function AdminItems({ locationId }: Props) {
                   사용자에게 보임
                 </label>
                 {item.category === "A" && (
-                  <label>
+                  <label className="inline-flex items-center gap-1 whitespace-nowrap">
                     <input
                       type="checkbox"
                       checked={item.allow_multiple}
