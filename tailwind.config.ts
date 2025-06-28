@@ -1,3 +1,5 @@
+import colors from "tailwindcss/colors";
+
 export default {
   content: [
     "./index.html",
@@ -6,7 +8,8 @@ export default {
   theme: {
     extend: {
       colors: {
-        redCross: '#d62828',
+        redCrossRed: colors.red,
+        warmGray: colors.warmGray,
       },
       fontSize: {
         sm: '0.95rem',

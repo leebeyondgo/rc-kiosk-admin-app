@@ -160,7 +160,7 @@ export default function GlobalItemManager() {
                 <div className="flex flex-col">
                   <span className="font-medium">{item.name}</span>
                   {item.description && (
-                    <span className="text-sm text-gray-500">{item.description}</span>
+                    <span className="text-sm text-warmGray-500">{item.description}</span>
                   )}
                 </div>
               </div>
@@ -178,7 +178,7 @@ export default function GlobalItemManager() {
                 <Button
                   variant="ghost"
                   onClick={() => handleDelete(item.id)}
-                  className="text-red-500"
+                  className="text-redCrossRed-500"
                   aria-label="삭제"
                 >
                   <Trash2 size={16} />

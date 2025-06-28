@@ -85,14 +85,14 @@ export default function ImageSelectorModal({ onSelect, onClose }: Props) {
               onClick={() => handleDelete(url)}
               aria-label="이미지 삭제"
             >
-              <Trash2 size={14} className="text-red-500" />
+              <Trash2 size={14} className="text-redCrossRed-500" />
             </button>
           </div>
         ))}
       </div>
 
       <div className="mt-4">
-        <label className="flex items-center gap-2 text-sm text-gray-600">
+        <label className="flex items-center gap-2 text-sm text-warmGray-600">
           <Upload size={16} />
           이미지 업로드:
           <input type="file" onChange={handleUpload} disabled={uploading} />
