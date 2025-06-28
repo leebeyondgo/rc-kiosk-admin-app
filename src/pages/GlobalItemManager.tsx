@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useToast } from "@/components/ui/Toast";
-import { createClient } from "@supabase/supabase-js";
-import { SUPABASE_URL, SUPABASE_ANON_KEY } from "@/lib/supabaseConfig";
+import supabase from "@/lib/supabaseClient";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -10,7 +9,6 @@ import { Trash2, Pencil } from "lucide-react";
 import ImageSelectorModal from "@/modals/ImageSelectorModal";
 import Modal from "@/components/ui/Modal";
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 interface GiftItem {
   id: string;

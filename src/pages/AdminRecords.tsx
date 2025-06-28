@@ -2,8 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import Loader from "@/components/ui/Loader";
 import { Trash2 } from "lucide-react";
-import { createClient } from "@supabase/supabase-js";
-import { SUPABASE_URL, SUPABASE_ANON_KEY } from "@/lib/supabaseConfig";
+import supabase from "@/lib/supabaseClient";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import Modal from "@/components/ui/Modal";
@@ -11,7 +10,6 @@ import StatisticsModal from "@/modals/StatisticsModal"; // 상단에 import
 import { GiftRecord } from "@/types"; // 타입 import
 import { useToast } from "@/components/ui/Toast";
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 interface Location {
   id: string;
