@@ -6,7 +6,11 @@ export default {
   theme: {
     extend: {
       colors: {
-        redCross: '#d62828',
+        redCrossRed: '#d62828',
+        redCrossWarmGray: '#9b8f8b',
+        redCrossGray: '#8c8c8c',
+        redCrossGold: '#d4af37',
+        redCrossSilver: '#c0c0c0',
       },
       fontSize: {
         sm: '0.95rem',
@@ -20,8 +24,8 @@ export default {
       },
       keyframes: {
         highlight: {
-          '0%, 100%': { backgroundColor: '#fef9c3' },
-          '50%': { backgroundColor: '#fde047' },
+          '0%, 100%': { backgroundColor: '#f9e5a7' },
+          '50%': { backgroundColor: '#c79e2e' },
         },
       },
       animation: {
