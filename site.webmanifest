@@ -1,0 +1,8 @@
+{
+  "name": "기념품 키오스크 관리",
+  "short_name": "키오스크 관리",
+  "start_url": "/rc-kiosk-admin-app/",
+  "display": "standalone",
+  "theme_color": "#ffffff",
+  "background_color": "#ffffff"
+}
