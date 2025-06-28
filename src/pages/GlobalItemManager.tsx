@@ -160,7 +160,7 @@ export default function GlobalItemManager() {
                 <div className="flex flex-col">
                   <span className="font-medium">{item.name}</span>
                   {item.description && (
-                    <span className="text-sm text-warmGray-500">{item.description}</span>
+                    <span className="text-sm text-redCrossWarmGray-500">{item.description}</span>
                   )}
                 </div>
               </div>

@@ -12,10 +12,10 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 
     const variantClasses = {
       default: "bg-redCrossRed-600 text-white hover:bg-redCrossRed-700 focus:ring-redCrossRed-500",
-      ghost: "bg-transparent text-black hover:bg-warmGray-100 border border-warmGray-300 focus:ring-warmGray-300",
-      subtle: "bg-warmGray-100 text-warmGray-800 hover:bg-warmGray-200 border border-warmGray-300 focus:ring-warmGray-300",
+      ghost: "bg-transparent text-black hover:bg-redCrossWarmGray-100 border border-redCrossWarmGray-300 focus:ring-redCrossWarmGray-300",
+      subtle: "bg-redCrossWarmGray-100 text-redCrossWarmGray-800 hover:bg-redCrossWarmGray-200 border border-redCrossWarmGray-300 focus:ring-redCrossWarmGray-300",
       danger: "bg-redCrossRed-100 text-redCrossRed-700 hover:bg-redCrossRed-200 border border-redCrossRed-300 focus:ring-redCrossRed-300",
-      soft: "bg-white text-warmGray-800 border border-warmGray-200 shadow-sm hover:bg-warmGray-50 focus:ring-warmGray-300"
+      soft: "bg-white text-redCrossWarmGray-800 border border-redCrossWarmGray-200 shadow-sm hover:bg-redCrossWarmGray-50 focus:ring-redCrossWarmGray-300"
     };
 
     return (

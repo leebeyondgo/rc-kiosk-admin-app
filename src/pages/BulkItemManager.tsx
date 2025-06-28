@@ -167,7 +167,7 @@ export default function BulkItemManager() {
               {locations.map((loc) => (
                 <div key={loc.id} className="border rounded p-4 shadow flex flex-col gap-2">
                   <h4 className="font-semibold text-lg">{loc.name}</h4>
-                  <div className="text-sm text-warmGray-500">
+                  <div className="text-sm text-redCrossWarmGray-500">
                     {(locationItemMap[loc.id]?.slice(0, 3) || []).join(", ")}
                     {locationItemMap[loc.id]?.length > 3 &&
                       ` 외 ${locationItemMap[loc.id].length - 3}개`}

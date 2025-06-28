@@ -30,7 +30,7 @@ export default function StatisticsModal({ data }: Props) {
       <h1 className="text-lg font-bold mb-4">기념품 통계</h1>
 
       {chartData.length === 0 ? (
-        <p className="text-center text-warmGray-400">데이터가 없습니다.</p>
+        <p className="text-center text-redCrossWarmGray-400">데이터가 없습니다.</p>
       ) : (
         <>
           {/* Chart */}
@@ -51,7 +51,7 @@ export default function StatisticsModal({ data }: Props) {
             <div className="overflow-x-auto">
               <table className="w-full text-sm border min-w-[300px]">
                 <thead>
-                  <tr className="bg-warmGray-100">
+                  <tr className="bg-redCrossWarmGray-100">
                     <th className="text-left px-4 py-2 border">기념품</th>
                     <th className="text-right px-4 py-2 border">선택 수</th>
                   </tr>

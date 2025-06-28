@@ -314,7 +314,7 @@ export default function AdminRecords() {
             )}
           </div>
           {selectedLocations.length > 0 && (
-            <div className="text-sm text-warmGray-600">
+            <div className="text-sm text-redCrossWarmGray-600">
               선택됨: {selectedLocations.map((id) => locations.find((l) => l.id === id)?.name).join(", ")}
             </div>
           )}
@@ -367,7 +367,7 @@ export default function AdminRecords() {
         </Button>
 
         {/* 선택 및 항목 수 */}
-        <div className="flex justify-between items-center text-sm text-warmGray-500">
+        <div className="flex justify-between items-center text-sm text-redCrossWarmGray-500">
           <label className="flex items-center gap-2">
             <input
               type="checkbox"
@@ -382,7 +382,7 @@ export default function AdminRecords() {
 
       {/* 결과 리스트 */}
       {filteredRecords.length === 0 ? (
-        <p className="text-warmGray-500 text-center">기록이 없습니다.</p>
+        <p className="text-redCrossWarmGray-500 text-center">기록이 없습니다.</p>
       ) : (
         <div className="space-y-4">
           {filteredRecords.map((record) => {
@@ -403,10 +403,10 @@ export default function AdminRecords() {
                 key={record.id}
                 className={`relative border rounded-lg p-4 shadow-sm cursor-pointer transition duration-500 ${
                   isAcknowledged
-                    ? "bg-warmGray-100 opacity-70"
+                    ? "bg-redCrossWarmGray-100 opacity-70"
                     : isHighlighted
                     ? "animate-highlight"
-                    : "bg-white hover:bg-warmGray-50"
+                    : "bg-white hover:bg-redCrossWarmGray-50"
                 }`}
                 onClick={() => toggleAcknowledge(record.id, record.is_paid || false)} // "확인함" 상태를 토글하는 부분
               >
@@ -434,15 +434,15 @@ export default function AdminRecords() {
                     e.stopPropagation();
                     handleDelete(record.id);
                   }}
-                  className="absolute top-3 right-3 text-warmGray-400 hover:text-redCrossRed-500"
+                  className="absolute top-3 right-3 text-redCrossWarmGray-400 hover:text-redCrossRed-500"
                   aria-label="기록 삭제"
                 >
                   <Trash2 size={16} />
                 </button>
 
                 <div className="ml-6 mb-1 flex flex-wrap items-center gap-2">
-                  <span className="font-semibold text-warmGray-800">{record.name}</span>
-                  <span className="text-xs text-warmGray-500">
+                  <span className="font-semibold text-redCrossWarmGray-800">{record.name}</span>
+                  <span className="text-xs text-redCrossWarmGray-500">
                     {new Date(record.timestamp || "").toLocaleString("ko-KR", {
                       year: "2-digit",
                       month: "2-digit",
@@ -451,14 +451,14 @@ export default function AdminRecords() {
                       minute: "2-digit",
                     })}
                   </span>
-                  <span className="text-xs text-warmGray-400">({locationName})</span>
+                  <span className="text-xs text-redCrossWarmGray-400">({locationName})</span>
                 </div>
 
                 <div className="grid grid-cols-2 gap-2 mt-2">
                   {items.map((item, i) => (
                     <div
                       key={i}
-                      className="flex justify-between items-center px-3 py-2 bg-warmGray-50 border rounded text-sm text-warmGray-700 shadow-inner"
+                      className="flex justify-between items-center px-3 py-2 bg-redCrossWarmGray-50 border rounded text-sm text-redCrossWarmGray-700 shadow-inner"
                     >
                       <span>{item}</span>
                     </div>
