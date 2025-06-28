@@ -117,19 +117,23 @@ export default function ImageSelectorModal({ onSelect, onClose }: Props) {
       </div>
 
       <div className="mt-4 flex items-center gap-2">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => fileInputRef.current?.click()}
-          disabled={uploading}
-          className="flex items-center gap-1"
-        >
-          <Upload size={16} />
-          이미지 업로드
-        </Button>
+        <label htmlFor="image-upload">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={uploading}
+            className="flex items-center gap-1"
+          >
+            <Upload size={16} />
+            이미지 업로드
+          </Button>
+        </label>
         <input
           ref={fileInputRef}
           type="file"
+          id="image-upload"
+          name="image-upload"
           onChange={handleUpload}
           disabled={uploading}
           className="sr-only"
