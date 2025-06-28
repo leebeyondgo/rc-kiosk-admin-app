@@ -143,11 +143,11 @@ export default function GlobalItemManager() {
       {/* 📋 현재 항목 목록 */}
       <div>
         <h3 className="font-semibold mb-3">기존 기념품 목록 ({items.length})</h3>
-        <ul className="space-y-2">
+        <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {items.map((item) => (
             <li
               key={item.id}
-              className="flex items-center justify-between border rounded px-4 py-2 bg-white shadow-sm"
+              className="flex items-center justify-between border rounded px-4 py-2 bg-white shadow-sm w-full"
             >
               <div className="flex items-center gap-3">
                 {item.image_url && (
